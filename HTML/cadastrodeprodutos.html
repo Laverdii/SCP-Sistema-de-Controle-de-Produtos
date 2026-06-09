@@ -112,6 +112,54 @@
       <p id="mensagem" class="mensagem"></p>
       <h2>Produtos Cadastrados</h2>
 
+      <div class="painel-filtros">
+        <div class="filtros-grade">
+          <div class="filtro-campo">
+            <label>Código do produto</label>
+            <input type="text" id="filtroCodProduto" placeholder="Ex: 5" />
+          </div>
+          <div class="filtro-campo">
+            <label>Código da categoria</label>
+            <input type="text" id="filtroCodCategoria" placeholder="Ex: 2" />
+          </div>
+          <div class="filtro-campo">
+            <label>Descrição</label>
+            <input
+              type="text"
+              id="filtroDescProduto"
+              placeholder="Buscar por descrição..."
+            />
+          </div>
+          <div class="filtro-campo">
+            <label>Observação</label>
+            <input
+              type="text"
+              id="filtroObsProduto"
+              placeholder="Buscar por observação..."
+            />
+          </div>
+        </div>
+        <div class="filtros-rodape">
+          <div class="filtro-campo">
+            <label>Status</label>
+            <div class="filtro-pills">
+              <button type="button" class="pill" data-status="ATIVO">
+                Ativo
+              </button>
+              <button type="button" class="pill" data-status="INATIVO">
+                Inativo
+              </button>
+            </div>
+          </div>
+          <div class="filtros-acoes">
+            <button type="button" id="btnLimparFiltros" class="btn-limpar-filtros">
+              Limpar filtros
+            </button>
+            <span id="contadorResultados" class="contador-resultados"></span>
+          </div>
+        </div>
+      </div>
+
       <!-- Tabela onde os produtos serão exibidos -->
       <table>
         <thead>

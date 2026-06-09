@@ -240,6 +240,105 @@ button {
   color: red;
 }
 
+/* Painel de filtros multi-campo (produtos) */
+.painel-filtros {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 15px;
+}
+
+.filtros-grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.filtro-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filtro-campo label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.filtro-campo input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.filtros-rodape {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filtro-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.pill {
+  padding: 5px 16px;
+  border-radius: 20px;
+  border: 2px solid #ccc;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.pill.ativa {
+  background: #356fa1;
+  color: white;
+  border-color: #356fa1;
+}
+
+.filtros-acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-limpar-filtros {
+  background: #ddd;
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+.contador-resultados {
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* Barra de pesquisa da listagem */
+.barra-pesquisa {
+  margin-bottom: 15px;
+}
+
+.barra-pesquisa input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
 /* Estilo da tabela */
 table {
   width: 100%;
@@ -290,6 +389,15 @@ td {
   .campo.nome,
   .acoes {
     grid-column: span 1;
+  }
+
+  .filtros-grade {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros-rodape {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   table {

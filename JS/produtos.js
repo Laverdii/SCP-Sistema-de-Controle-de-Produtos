@@ -33,6 +33,17 @@ const statusProdutoInput = document.getElementById("statusProduto");
 const btnSalvar = document.getElementById("btnSalvar");
 const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
 
+const filtroCodProdutoInput = document.getElementById("filtroCodProduto");
+const filtroCodCategoriaInput = document.getElementById("filtroCodCategoria");
+const filtroDescProdutoInput = document.getElementById("filtroDescProduto");
+const filtroObsProdutoInput = document.getElementById("filtroObsProduto");
+const btnLimparFiltros = document.getElementById("btnLimparFiltros");
+const contadorResultados = document.getElementById("contadorResultados");
+const pillsStatus = document.querySelectorAll(".pill[data-status]");
+
+let produtosCarregados = [];
+const statusSelecionados = new Set();
+
 /*
   ============================================
   FUNÇÃO PARA MOSTRAR MENSAGEM NA TELA
@@ -133,62 +144,21 @@ async function carregarCategoriasDoSelect() {
   });
 }
 
-async function carregarProdutos() {
-  const { data, error } = await supabaseClient
-    .from("produto")
-    .select(
-      "produtoid, categoriaprodutoid, ds_produto, obs_produto, vl_venda_produto, dt_cadastro_produto, status_produto",
-    )
-    .order("produtoid", { ascending: true });
-
-  /*
-    Se der erro na consulta, mostramos uma mensagem na tabela
-    e também uma mensagem de erro acima da listagem.
-  */
-  if (error) {
+function renderizarProdutos(produtos) {
+  if (produtos.length === 0) {
     tabelaProdutos.innerHTML = `
       <tr>
-        <td colspan="8">Erro ao carregar Produtos.</td>
-      </tr>
-    `;
-
-    mostrarMensagem("Erro ao buscar produtos: " + error.message, "erro");
-    return;
-  }
-
-  /*
-    Se a consulta funcionar, mas não houver nenhum Produto,
-    mostramos uma mensagem dizendo que não há registros.
-  */
-  if (data.length === 0) {
-    tabelaProdutos.innerHTML = `
-      <tr>
-        <td colspan="8">Nenhum Produto cadastrado.</td>
+        <td colspan="8">Nenhum produto encontrado.</td>
       </tr>
     `;
     return;
   }
 
-  /*
-    Limpamos o corpo da tabela antes de preencher.
-    Isso evita duplicar linhas quando recarregamos os Produtos.
-  */
   tabelaProdutos.innerHTML = "";
 
-  /*
-    Percorremos a lista de Produtos retornada pelo Supabase.
-
-    Para cada Produto, criamos uma linha <tr>.
-  */
-  data.forEach(function (Produto) {
+  produtos.forEach(function (Produto) {
     const linha = document.createElement("tr");
 
-    /*
-      Criamos as colunas principais da linha.
-
-      A última coluna recebe a classe "coluna-acoes".
-      Nessa coluna colocaremos os botões Editar e Excluir.
-    */
     linha.innerHTML = `
       <td>${Produto.produtoid}</td>
       <td>${Produto.categoriaprodutoid}</td>
@@ -200,59 +170,92 @@ async function carregarProdutos() {
       <td class="coluna-acoes"></td>
     `;
 
-    /*
-      ============================================
-      BOTÃO EDITAR
-      ============================================
-    */
-
     const botaoEditar = document.createElement("button");
-
     botaoEditar.textContent = "Editar";
     botaoEditar.className = "btn-editar";
     botaoEditar.type = "button";
-
-    /*
-      Quando clicar no botão Editar,
-      chamamos a função prepararEdicao
-      passando o Produto da linha atual.
-    */
     botaoEditar.addEventListener("click", function () {
       prepararEdicao(Produto);
     });
 
-    /*
-      ============================================
-      BOTÃO EXCLUIR
-      ============================================
-    */
-
     const botaoExcluir = document.createElement("button");
-
     botaoExcluir.textContent = "Excluir";
     botaoExcluir.className = "btn-excluir";
     botaoExcluir.type = "button";
-
-    /*
-      Quando clicar no botão Excluir,
-      chamamos a função excluirProduto
-      passando o Produto da linha atual.
-    */
     botaoExcluir.addEventListener("click", function () {
       excluirProduto(Produto);
     });
 
-    /*
-      Adicionamos os botões dentro da coluna Ações.
-    */
     linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
     linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
-
-    /*
-      Adicionamos a linha pronta dentro do tbody da tabela.
-    */
     tabelaProdutos.appendChild(linha);
   });
+}
+
+function filtrarProdutos() {
+  const codProduto = filtroCodProdutoInput.value.trim();
+  const codCategoria = filtroCodCategoriaInput.value.trim();
+  const desc = filtroDescProdutoInput.value.toLowerCase().trim();
+  const obs = filtroObsProdutoInput.value.toLowerCase().trim();
+
+  const filtrados = produtosCarregados.filter(function (produto) {
+    if (codProduto && !String(produto.produtoid).includes(codProduto))
+      return false;
+    if (
+      codCategoria &&
+      !String(produto.categoriaprodutoid).includes(codCategoria)
+    )
+      return false;
+    if (desc && !produto.ds_produto.toLowerCase().includes(desc)) return false;
+    if (obs && !produto.obs_produto.toLowerCase().includes(obs)) return false;
+    if (
+      statusSelecionados.size > 0 &&
+      !statusSelecionados.has(produto.status_produto)
+    )
+      return false;
+    return true;
+  });
+
+  renderizarProdutos(filtrados);
+
+  const total = produtosCarregados.length;
+  contadorResultados.textContent =
+    filtrados.length === total
+      ? `${total} produto${total !== 1 ? "s" : ""}`
+      : `${filtrados.length} de ${total} produto${total !== 1 ? "s" : ""}`;
+}
+
+async function carregarProdutos() {
+  const { data, error } = await supabaseClient
+    .from("produto")
+    .select(
+      "produtoid, categoriaprodutoid, ds_produto, obs_produto, vl_venda_produto, dt_cadastro_produto, status_produto",
+    )
+    .order("produtoid", { ascending: true });
+
+  if (error) {
+    tabelaProdutos.innerHTML = `
+      <tr>
+        <td colspan="8">Erro ao carregar Produtos.</td>
+      </tr>
+    `;
+    mostrarMensagem("Erro ao buscar produtos: " + error.message, "erro");
+    return;
+  }
+
+  if (data.length === 0) {
+    produtosCarregados = [];
+    tabelaProdutos.innerHTML = `
+      <tr>
+        <td colspan="8">Nenhum Produto cadastrado.</td>
+      </tr>
+    `;
+    contadorResultados.textContent = "0 produtos";
+    return;
+  }
+
+  produtosCarregados = data;
+  filtrarProdutos();
 }
 
 /*
@@ -565,14 +568,40 @@ btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 
-/*
-  ============================================
-  CARREGAMENTO INICIAL DA PÁGINA
-  ============================================
+pillsStatus.forEach(function (pill) {
+  pill.addEventListener("click", function () {
+    const status = pill.dataset.status;
+    if (statusSelecionados.has(status)) {
+      statusSelecionados.delete(status);
+      pill.classList.remove("ativa");
+    } else {
+      statusSelecionados.add(status);
+      pill.classList.add("ativa");
+    }
+    filtrarProdutos();
+  });
+});
 
-  Assim que o arquivo JavaScript é carregado,
-  buscamos os Produtos no Supabase.
-*/
+[
+  filtroCodProdutoInput,
+  filtroCodCategoriaInput,
+  filtroDescProdutoInput,
+  filtroObsProdutoInput,
+].forEach(function (input) {
+  input.addEventListener("input", filtrarProdutos);
+});
+
+btnLimparFiltros.addEventListener("click", function () {
+  filtroCodProdutoInput.value = "";
+  filtroCodCategoriaInput.value = "";
+  filtroDescProdutoInput.value = "";
+  filtroObsProdutoInput.value = "";
+  statusSelecionados.clear();
+  pillsStatus.forEach(function (pill) {
+    pill.classList.remove("ativa");
+  });
+  filtrarProdutos();
+});
 
 preencherDatasAutomaticas();
 carregarCategoriasDoSelect();

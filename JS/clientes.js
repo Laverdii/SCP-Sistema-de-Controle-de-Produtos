@@ -21,6 +21,9 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const formCliente = document.getElementById("formCliente");
 const tabelaClientes = document.getElementById("tabelaClientes");
 const mensagem = document.getElementById("mensagem");
+const pesquisaClienteInput = document.getElementById("pesquisaCliente");
+
+let clientesCarregados = [];
 
 const clienteIdInput = document.getElementById("clienteId");
 const tipoClienteInput = document.getElementById("tipoCliente");
@@ -313,6 +316,70 @@ async function buscarProximoClienteIdDisponivel() {
   .from("cliente")
 */
 
+function renderizarClientes(clientes) {
+  if (clientes.length === 0) {
+    tabelaClientes.innerHTML = `
+      <tr>
+        <td colspan="5">Nenhum cliente encontrado.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tabelaClientes.innerHTML = "";
+
+  clientes.forEach(function (cliente) {
+    const linha = document.createElement("tr");
+
+    linha.innerHTML = `
+      <td>${cliente.clienteid}</td>
+      <td>${formatarTipoCliente(cliente.tipo_cliente)}</td>
+      <td>${cliente.cpf_cnpj_cliente}</td>
+      <td>${cliente.nome_cliente}</td>
+      <td class="coluna-acoes"></td>
+    `;
+
+    const botaoEditar = document.createElement("button");
+    botaoEditar.textContent = "Editar";
+    botaoEditar.className = "btn-editar";
+    botaoEditar.type = "button";
+    botaoEditar.addEventListener("click", function () {
+      prepararEdicao(cliente);
+    });
+
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.textContent = "Excluir";
+    botaoExcluir.className = "btn-excluir";
+    botaoExcluir.type = "button";
+    botaoExcluir.addEventListener("click", function () {
+      excluirCliente(cliente);
+    });
+
+    linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
+    linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
+
+    tabelaClientes.appendChild(linha);
+  });
+}
+
+function filtrarClientes() {
+  const termo = pesquisaClienteInput.value.toLowerCase().trim();
+
+  if (!termo) {
+    renderizarClientes(clientesCarregados);
+    return;
+  }
+
+  const filtrados = clientesCarregados.filter(function (cliente) {
+    return (
+      cliente.nome_cliente.toLowerCase().includes(termo) ||
+      String(cliente.clienteid).includes(termo)
+    );
+  });
+
+  renderizarClientes(filtrados);
+}
+
 async function carregarClientes() {
   /*
     Faz um SELECT na tabela cliente.
@@ -350,6 +417,7 @@ async function carregarClientes() {
     mostramos uma mensagem dizendo que não há registros.
   */
   if (data.length === 0) {
+    clientesCarregados = [];
     tabelaClientes.innerHTML = `
       <tr>
         <td colspan="5">Nenhum cliente cadastrado.</td>
@@ -358,87 +426,8 @@ async function carregarClientes() {
     return;
   }
 
-  /*
-    Limpamos o corpo da tabela antes de preencher.
-    Isso evita duplicar linhas quando recarregamos os clientes.
-  */
-  tabelaClientes.innerHTML = "";
-
-  /*
-    Percorremos a lista de clientes retornada pelo Supabase.
-
-    Para cada cliente, criamos uma linha <tr>.
-  */
-  data.forEach(function (cliente) {
-    const linha = document.createElement("tr");
-
-    /*
-      Criamos as colunas principais da linha.
-
-      A última coluna recebe a classe "coluna-acoes".
-      Nessa coluna colocaremos os botões Editar e Excluir.
-    */
-    linha.innerHTML = `
-      <td>${cliente.clienteid}</td>
-      <td>${formatarTipoCliente(cliente.tipo_cliente)}</td>
-      <td>${cliente.cpf_cnpj_cliente}</td>
-      <td>${cliente.nome_cliente}</td>
-      <td class="coluna-acoes"></td>
-    `;
-
-    /*
-      ============================================
-      BOTÃO EDITAR
-      ============================================
-    */
-
-    const botaoEditar = document.createElement("button");
-
-    botaoEditar.textContent = "Editar";
-    botaoEditar.className = "btn-editar";
-    botaoEditar.type = "button";
-
-    /*
-      Quando clicar no botão Editar,
-      chamamos a função prepararEdicao
-      passando o cliente da linha atual.
-    */
-    botaoEditar.addEventListener("click", function () {
-      prepararEdicao(cliente);
-    });
-
-    /*
-      ============================================
-      BOTÃO EXCLUIR
-      ============================================
-    */
-
-    const botaoExcluir = document.createElement("button");
-
-    botaoExcluir.textContent = "Excluir";
-    botaoExcluir.className = "btn-excluir";
-    botaoExcluir.type = "button";
-
-    /*
-      Quando clicar no botão Excluir,
-      chamamos a função excluirCliente
-      passando o cliente da linha atual.
-    */
-    botaoExcluir.addEventListener("click", function () {
-      excluirCliente(cliente);
-    });
-
-    /*
-      Adicionamos os botões dentro da coluna Ações.
-    */
-    linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
-    linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
-
-    /*
-      Adicionamos a linha pronta dentro do tbody da tabela.
-    */
-    tabelaClientes.appendChild(linha);
-  });
+  clientesCarregados = data;
+  filtrarClientes();
 }
 
 /*
@@ -806,6 +795,8 @@ tipoClienteInput.addEventListener("change", function () {
 });
 
 cpfCnpjClienteInput.addEventListener("input", aplicarMascaraCpfCnpj);
+
+pesquisaClienteInput.addEventListener("input", filtrarClientes);
 
 /*
   ============================================

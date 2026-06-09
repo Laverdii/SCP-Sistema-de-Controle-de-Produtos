@@ -29,11 +29,15 @@ const produtoOriginalItemInput = document.getElementById("produtoOriginalItem");
 const btnCancelarItem = document.getElementById("btnCancelarItem");
 const btnSalvarItem = document.getElementById("btnSalvarItem");
 const thAcoes = document.getElementById("thAcoes");
+const pesquisaItemOrcamentoInput = document.getElementById(
+  "pesquisaItemOrcamento",
+);
 
 const DIAS_VALIDADE_ORCAMENTO = 7;
 
 let produtos = [];
 let editandoItens = false;
+let itensOrcamentoCarregados = [];
 
 function mostrarMensagem(texto, tipo) {
   mensagem.textContent = texto;
@@ -295,53 +299,15 @@ async function atualizarTotalOrcamento(total) {
   }
 }
 
-async function carregarItensOrcamento() {
-  const clienteId = clienteOrcamentoInput.value;
-  const orcamentoId = orcamentoIdInput.value;
-
-  if (!clienteId) {
-    limparTabelaItens("Selecione um cliente para ver os itens do orçamento.");
+function renderizarItensOrcamento(itens) {
+  if (itens.length === 0) {
+    limparTabelaItens("Nenhum item encontrado para este orçamento.");
     return;
   }
 
-  if (!orcamentoId) {
-    limparTabelaItens(
-      "Clique em Atribuir orçamento para criar o orçamento deste cliente.",
-    );
-    return;
-  }
-
-  const { data, error } = await supabaseClient
-    .from("orcamento_item")
-    .select(
-      "orcamentoid, produtoid, produtodesc, qt_produto, vl_unitario, vl_total",
-    )
-    .eq("orcamentoid", orcamentoId)
-    .order("produtoid", { ascending: true });
-
-  if (error) {
-    limparTabelaItens("Erro ao carregar itens do orçamento.");
-    mostrarMensagem(
-      "Erro ao buscar itens do orçamento: " + error.message,
-      "erro",
-    );
-    return;
-  }
-
-  if (data.length === 0) {
-    await atualizarTotalOrcamento(0);
-    limparTabelaItens("Nenhum item cadastrado para este orçamento.");
-    return;
-  }
-
-  const totalOrcamento = data.reduce(function (total, item) {
-    return total + Number(item.vl_total || 0);
-  }, 0);
-
-  await atualizarTotalOrcamento(totalOrcamento);
   tabelaOrcamentos.innerHTML = "";
 
-  data.forEach(function (item) {
+  itens.forEach(function (item) {
     const linha = document.createElement("tr");
 
     linha.innerHTML = `
@@ -378,6 +344,77 @@ async function carregarItensOrcamento() {
 
     tabelaOrcamentos.appendChild(linha);
   });
+}
+
+function filtrarItensOrcamento() {
+  const termo = pesquisaItemOrcamentoInput.value.toLowerCase().trim();
+
+  if (!termo) {
+    renderizarItensOrcamento(itensOrcamentoCarregados);
+    return;
+  }
+
+  const filtrados = itensOrcamentoCarregados.filter(function (item) {
+    return (
+      String(item.produtoid).includes(termo) ||
+      item.produtodesc.toLowerCase().includes(termo)
+    );
+  });
+
+  renderizarItensOrcamento(filtrados);
+}
+
+async function carregarItensOrcamento() {
+  const clienteId = clienteOrcamentoInput.value;
+  const orcamentoId = orcamentoIdInput.value;
+
+  if (!clienteId) {
+    itensOrcamentoCarregados = [];
+    limparTabelaItens("Selecione um cliente para ver os itens do orçamento.");
+    return;
+  }
+
+  if (!orcamentoId) {
+    itensOrcamentoCarregados = [];
+    limparTabelaItens(
+      "Clique em Atribuir orçamento para criar o orçamento deste cliente.",
+    );
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("orcamento_item")
+    .select(
+      "orcamentoid, produtoid, produtodesc, qt_produto, vl_unitario, vl_total",
+    )
+    .eq("orcamentoid", orcamentoId)
+    .order("produtoid", { ascending: true });
+
+  if (error) {
+    itensOrcamentoCarregados = [];
+    limparTabelaItens("Erro ao carregar itens do orçamento.");
+    mostrarMensagem(
+      "Erro ao buscar itens do orçamento: " + error.message,
+      "erro",
+    );
+    return;
+  }
+
+  if (data.length === 0) {
+    itensOrcamentoCarregados = [];
+    await atualizarTotalOrcamento(0);
+    limparTabelaItens("Nenhum item cadastrado para este orçamento.");
+    return;
+  }
+
+  const totalOrcamento = data.reduce(function (total, item) {
+    return total + Number(item.vl_total || 0);
+  }, 0);
+
+  await atualizarTotalOrcamento(totalOrcamento);
+
+  itensOrcamentoCarregados = data;
+  filtrarItensOrcamento();
 }
 
 function prepararEdicaoItem(item) {
@@ -619,6 +656,7 @@ async function atribuirOrcamentoAoCliente() {
 async function selecionarCliente() {
   const clienteId = clienteOrcamentoInput.value;
 
+  pesquisaItemOrcamentoInput.value = "";
   limparModoEdicao();
   preencherDatasAutomaticas();
 
@@ -659,6 +697,8 @@ function alternarEdicaoItens() {
   atualizarEstadoEdicaoItens();
   carregarItensOrcamento();
 }
+
+pesquisaItemOrcamentoInput.addEventListener("input", filtrarItensOrcamento);
 
 formOrcamento.addEventListener("submit", async function (evento) {
   evento.preventDefault();
