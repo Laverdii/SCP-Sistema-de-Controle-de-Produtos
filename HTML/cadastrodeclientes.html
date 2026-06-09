@@ -94,25 +94,27 @@
       </div>
 
       <!-- Tabela onde os clientes serão exibidos -->
-      <table>
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Tipo</th>
-            <th>CPF / CNPJ</th>
-            <th>Nome</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Tipo</th>
+              <th>CPF / CNPJ</th>
+              <th>Nome</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
 
-        <!-- O tbody começa com uma mensagem.
-           Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
-        <tbody id="tabelaClientes">
-          <tr>
-            <td colspan="5">Carregando clientes...</td>
-          </tr>
-        </tbody>
-      </table>
+          <!-- O tbody começa com uma mensagem.
+             Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
+          <tbody id="tabelaClientes">
+            <tr>
+              <td colspan="5">Carregando clientes...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </main>
     <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

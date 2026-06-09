@@ -164,24 +164,26 @@
         />
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Descrição do produto</th>
-            <th>Qntd.</th>
-            <th>Valor unitário</th>
-            <th>Valor total</th>
-            <th id="thAcoes">Ações</th>
-          </tr>
-        </thead>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Descrição do produto</th>
+              <th>Qntd.</th>
+              <th>Valor unitário</th>
+              <th>Valor total</th>
+              <th id="thAcoes">Ações</th>
+            </tr>
+          </thead>
 
-        <tbody id="tabelaOrcamento">
-          <tr>
-            <td colspan="6">Carregando itens do orçamento...</td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody id="tabelaOrcamento">
+            <tr>
+              <td colspan="6">Carregando itens do orçamento...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
       <script src="../JS/orcamento.js"></script>

@@ -1,4 +1,10 @@
-/* Estilo geral da página */
+/* ─── Reset & base ──────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: #f4f4f4;
@@ -6,6 +12,7 @@ body {
   padding: 0 30px 30px;
 }
 
+/* ─── Navbar ─────────────────────────────────────────────────────── */
 .navbar {
   background: #356fa1;
   margin: 0 -30px 30px;
@@ -36,7 +43,7 @@ body {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* Caixa principal onde fica todo o conteúdo */
+/* ─── Containers ─────────────────────────────────────────────────── */
 .container-login {
   max-width: 400px;
   width: 100%;
@@ -54,13 +61,12 @@ body {
   border-radius: 8px;
 }
 
-/* Espaçamento dos títulos */
 h1,
 h2 {
   margin-bottom: 15px;
 }
 
-/* Formulário organizado em duas colunas */
+/* ─── Forms grid ─────────────────────────────────────────────────── */
 .form-cliente,
 .form-categoria,
 .form-produto {
@@ -70,6 +76,7 @@ h2 {
   margin-bottom: 15px;
 }
 
+/* ─── Login page ─────────────────────────────────────────────────── */
 .body-login {
   font-family: Arial, Helvetica, sans-serif;
   background: #f4f4f4;
@@ -79,7 +86,6 @@ h2 {
   justify-content: center;
   align-items: center;
   padding: 30px;
-  transform: translateY(-150px);
 }
 
 .box-login > h1 {
@@ -93,31 +99,34 @@ h2 {
   margin-bottom: 15px;
 }
 
+/* ─── Home page ──────────────────────────────────────────────────── */
 .box-home {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 15px;
-  text-align: center;
+  align-items: center;
+}
+
+.btn-home {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-home a {
+  display: block;
+  width: 100%;
+  max-width: 400px;
 }
 
 .box-home button {
+  width: 100%;
   text-align: center;
-  display: inline-block;
-  min-width: 400px;
-  text-align: center;
-  padding: 10px;
-  text-align: center;
+  padding: 12px 16px;
 }
 
-.box-home > a {
-  display: inline-block;
-  min-width: 200px;
-  text-align: center;
-}
-
-/* Cada campo fica em formato vertical:
-       label em cima e input embaixo */
+/* ─── Form fields ────────────────────────────────────────────────── */
 .campo {
   display: flex;
   flex-direction: column;
@@ -133,25 +142,37 @@ h2 {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 1rem;
 }
 
-/* O campo nome ocupa as duas colunas do formulário */
+.campo input:focus,
+.campo select:focus {
+  outline: 2px solid #356fa1;
+  outline-offset: 1px;
+  border-color: #356fa1;
+}
+
 .campo.nome {
   grid-column: span 2;
 }
 
-/* Área onde ficam os botões do formulário */
+/* ─── Form action buttons ────────────────────────────────────────── */
 .acoes {
   grid-column: span 2;
-  text-align: right;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-/* Estilo base dos botões */
+/* ─── Buttons ────────────────────────────────────────────────────── */
 button {
   padding: 10px 16px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 .form-orcamento button:disabled,
@@ -160,6 +181,50 @@ button {
   opacity: 0.65;
 }
 
+.btn-salvar,
+.btn-abas {
+  background: #356fa1;
+  color: rgb(255, 255, 255);
+}
+
+.btn-limpar {
+  background: #ddd;
+}
+
+.btn-editar {
+  background: #ff9c07;
+  color: #333;
+  padding: 6px 10px;
+  margin-right: 5px;
+}
+
+.btn-excluir {
+  background: #dc3545;
+  color: white;
+  padding: 6px 10px;
+}
+
+.btn-cancelar-edicao {
+  background: #356fa1;
+  color: white;
+  display: none;
+}
+
+/* ─── Messages ───────────────────────────────────────────────────── */
+.mensagem {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.sucesso {
+  color: green;
+}
+
+.erro {
+  color: red;
+}
+
+/* ─── Orçamento forms ────────────────────────────────────────────── */
 .form-orcamento,
 .form-item-orcamento {
   display: grid;
@@ -174,16 +239,18 @@ button {
   gap: 10px;
   justify-content: space-between;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .cabecalho-itens-orcamento h2 {
-  margin-bottom: 15px;
+  margin-bottom: 0;
 }
 
 .acoes-orcamento {
   align-items: center;
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .acoes-orcamento .btn-editar,
@@ -191,56 +258,7 @@ button {
   margin-right: 0;
 }
 
-/* Botão salvar/atualizar */
-.btn-salvar,
-.btn-abas {
-  background: #356fa1;
-  color: rgb(255, 255, 255);
-}
-
-/* Botão limpar */
-.btn-limpar {
-  background: #ddd;
-}
-
-/* Botão editar que aparece dentro da tabela */
-.btn-editar {
-  background: #ff9c07;
-  color: #333;
-  padding: 6px 10px;
-  margin-right: 5px;
-}
-
-/* Botão excluir que aparece dentro da tabela */
-.btn-excluir {
-  background: #dc3545;
-  color: white;
-  padding: 6px 10px;
-}
-
-/* Botão cancelar edição.
-       Começa escondido e só aparece quando o usuário clica em editar. */
-.btn-cancelar-edicao {
-  background: #356fa1;
-  color: white;
-  display: none;
-}
-
-/* Área de mensagem de sucesso ou erro */
-.mensagem {
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.sucesso {
-  color: green;
-}
-
-.erro {
-  color: red;
-}
-
-/* Painel de filtros multi-campo (produtos) */
+/* ─── Filter panel ───────────────────────────────────────────────── */
 .painel-filtros {
   background: #f9f9f9;
   border: 1px solid #e0e0e0;
@@ -274,7 +292,13 @@ button {
   padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 1rem;
+}
+
+.filtro-campo input:focus {
+  outline: 2px solid #356fa1;
+  outline-offset: 1px;
+  border-color: #356fa1;
 }
 
 .filtros-rodape {
@@ -288,6 +312,7 @@ button {
 .filtro-pills {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .pill {
@@ -325,7 +350,7 @@ button {
   white-space: nowrap;
 }
 
-/* Barra de pesquisa da listagem */
+/* ─── Search bar ─────────────────────────────────────────────────── */
 .barra-pesquisa {
   margin-bottom: 15px;
 }
@@ -335,11 +360,21 @@ button {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-sizing: border-box;
-  font-size: 14px;
+  font-size: 1rem;
 }
 
-/* Estilo da tabela */
+.barra-pesquisa input:focus {
+  outline: 2px solid #356fa1;
+  outline-offset: 1px;
+  border-color: #356fa1;
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────── */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -357,7 +392,7 @@ td {
   text-align: left;
 }
 
-/* Ajuste para telas pequenas */
+/* ─── Responsive — phones (≤ 700px) ─────────────────────────────── */
 @media (max-width: 700px) {
   body {
     padding: 0 15px 20px;
@@ -391,6 +426,17 @@ td {
     grid-column: span 1;
   }
 
+  .acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acoes button {
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+  }
+
   .filtros-grade {
     grid-template-columns: 1fr;
   }
@@ -400,8 +446,42 @@ td {
     align-items: flex-start;
   }
 
-  table {
-    display: block;
-    overflow-x: auto;
+  .cabecalho-itens-orcamento {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cabecalho-itens-orcamento h2 {
+    margin-bottom: 5px;
+  }
+}
+
+/* ─── Responsive — small phones (≤ 480px) ───────────────────────── */
+@media (max-width: 480px) {
+  body {
+    padding: 0 10px 20px;
+  }
+
+  .navbar {
+    margin: 0 -10px 15px;
+    width: calc(100% + 20px);
+  }
+
+  .navbar a {
+    font-size: 13px;
+    padding: 7px 8px;
+  }
+
+  .container,
+  .container-login {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
   }
 }
