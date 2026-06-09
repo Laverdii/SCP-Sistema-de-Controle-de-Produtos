@@ -277,7 +277,12 @@ function prepararEdicao(Produto) {
   */
   descProdutoInput.value = Produto.ds_produto;
   obsProdutoInput.value = Produto.obs_produto;
-  dataCadastroInput.value = Produto.dt_cadastro_produto;
+  dataCadastroInput.value = Produto.dt_cadastro_produto
+    ? Produto.dt_cadastro_produto.substring(0, 10)
+    : "";
+  statusProdutoInput.value = Produto.status_produto;
+  valorProdutoInput.value = Produto.vl_venda_produto;
+  categoriaProdutoInput.value = Produto.categoriaprodutoid;
 
   /*
     Mudamos o texto do botão principal para "Atualizar".
