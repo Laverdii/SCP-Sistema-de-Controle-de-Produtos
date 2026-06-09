@@ -25,12 +25,13 @@ const formProduto = document.getElementById("formProduto");
 const tabelaProdutos = document.getElementById("tabelaProdutos");
 const mensagem = document.getElementById("mensagem");
 
-const ProdutoIdInput = document.getElementById("ProdutoId");
+const produtoIdInput = document.getElementById("produtoId");
 const categoriaProdutoInput = document.getElementById("categoriaProduto");
-const descProduto = document.getElementById("descProduto");
-const obsProduto = document.getElementById("")
+const descProdutoInput = document.getElementById("descProduto");
+const obsProdutoInput = document.getElementById("obsProduto")
 const valorProdutoInput = document.getElementById("valorProduto");
-const dataCadastroInput = document.getElementById("dataCadastro")
+const dataCadastroInput = document.getElementById("dataCadastro");
+const statusProdutoInput = document.getElementById("statusProduto")
 
 const btnSalvar = document.getElementById("btnSalvar");
 const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
@@ -116,7 +117,7 @@ async function carregarCategoriasDoSelect() {
   const { data, error } = await supabaseClient
     .from("categoria_produto")
     .select("categoriaprodutoid, ds_categoria_produto")
-    .order("ds_categoria_produto", { ascending: true });
+    .order("categoriaprodutoid", { ascending: true });
 
   if (error) {
     mostrarMensagem("Erro ao carregar categorias: " + error.message, "erro");
@@ -196,7 +197,7 @@ async function carregarProdutos() {
       <td>${Produto.ds_produto}</td>
       <td>${Produto.obs_produto}</td>
       <td>${Produto.vl_venda_produto}</td>
-      <td>${Produto.dt_cadastro_produto}</td>
+      <td>${Produto.dt_cadastro_produto ? Produto.dt_cadastro_produto.substring(0, 10) : ""}</td>
       <td>${Produto.status_produto}</td>
       <td class="coluna-acoes"></td>
     `;
@@ -271,14 +272,18 @@ function prepararEdicao(Produto) {
     Preenche o campo código.
     Esse campo é importante porque usaremos o ID para saber qual Produto atualizar.
   */
-  ProdutoIdInput.value = Produto.produtoid;
+  produtoIdInput.value = Produto.produtoid;
 
   /*
     Preenche os demais campos com os dados do Produto.
   */
-  descProduto.value = Produto.ds_produto;
-  obsProduto.value = Produto.obs_produto;
-  dataCadastroInput.value = Produto.nome_Produto;
+  categoriaProdutoInput.value = Produto.categoriaprodutoid
+  descProdutoInput.value = Produto.ds_produto;
+  obsProdutoInput.value = Produto.obs_produto;
+  valorProdutoInput.value = Produto.vl_venda_produto
+  dataCadastroInput.value = Produto.dt_cadastro_produto ? Produto.dt_cadastro_produto.substring(0, 10) : "";
+  statusProdutoInput.value = Produto.status_produto;
+
 
   /*
     Mudamos o texto do botão principal para "Atualizar".
@@ -293,7 +298,7 @@ function prepararEdicao(Produto) {
   /*
     Mostramos uma mensagem informando que o usuário está editando.
   */
-  mostrarMensagem("Editando o Produto: " + Produto.obs_produto + " - " + Produto.ds_produto + "sucesso");
+  mostrarMensagem("Editando o Produto: " + Produto.obs_produto + " - " + Produto.ds_produto);
 }
 
 /*
@@ -305,16 +310,10 @@ function prepararEdicao(Produto) {
 */
 
 function cancelarEdicao() {
-  /*
-    Limpa os campos do formulário.
-  */
   formProduto.reset();
+  preencherDatasAutomaticas();
 
-  /*
-    Garante que o ID fique vazio.
-    Se o ID estiver vazio, o sistema entende que é um novo cadastro.
-  */
-  ProdutoIdInput.value = "";
+  produtoIdInput.value = "";
 
   /*
     Volta o botão principal para "Salvar".
@@ -349,11 +348,11 @@ async function salvarProduto() {
   */
  
   const categoriaProduto = categoriaProdutoInput.value;
-  const descProduto = descProduto.value;
-  const obsProduto = obsProduto.value;
+  const descProduto = descProdutoInput.value;
+  const obsProduto = obsProdutoInput.value;
   const valorProduto = valorProdutoInput.value;
   const dataCadastro = dataCadastroInput.value;
-  const statusProduto = statusProduto.value;
+  const statusProduto = statusProdutoInput.value;
 
   let proximoProdutoId;
   try {
@@ -399,14 +398,9 @@ async function salvarProduto() {
   */
   mostrarMensagem("Produto salvo com sucesso!", "sucesso");
 
-  /*
-    Limpamos o formulário.
-  */
   formProduto.reset();
+  preencherDatasAutomaticas();
 
-  /*
-    Recarregamos a listagem para mostrar o novo Produto na tabela.
-  */
   carregarProdutos();
 }
 
@@ -420,51 +414,34 @@ async function salvarProduto() {
   Ela será chamada quando o campo ProdutoId estiver preenchido.
 */
 
-async function atualizarNomeProduto() {
-  /*
-    Pegamos o ID do Produto que está sendo editado.
-  */
-  const ProdutoId = ProdutoIdInput.value;
+async function atualizarProduto() {
+  const produtoId = produtoIdInput.value;
+  const categoriaProduto = categoriaProdutoInput.value;
+  const descProduto = descProdutoInput.value;
+  const obsProduto = obsProdutoInput.value;
+  const valorProduto = valorProdutoInput.value;
+  const dataCadastro = dataCadastroInput.value;
+  const statusProduto = statusProdutoInput.value;
 
-  /*
-    Pegamos o novo nome digitado.
-  */
-  const ds_Produto = descProduto.value;
-
-  /*
-    Atualizamos somente a coluna ds_produto.
-
-    O filtro .eq("produtoid", ProdutoId) é essencial.
-    Ele informa qual registro será atualizado.
-  */
   const { error } = await supabaseClient
     .from("produto")
     .update({
-      ds_produto: ds_Produto
+      categoriaprodutoid: categoriaProduto,
+      ds_produto: descProduto,
+      obs_produto: obsProduto,
+      vl_venda_produto: valorProduto,
+      dt_cadastro_produto: dataCadastro,
+      status_produto: statusProduto
     })
-    .eq("produtoid", ProdutoId);
+    .eq("produtoid", produtoId);
 
-  /*
-    Se houver erro, mostramos a mensagem e paramos.
-  */
   if (error) {
     mostrarMensagem("Erro ao atualizar Produto: " + error.message, "erro");
     return;
   }
 
-  /*
-    Se deu certo, mostramos mensagem de sucesso.
-  */
-  mostrarMensagem("Nome atualizado com sucesso!", "sucesso");
-
-  /*
-    Saímos do modo edição.
-  */
   cancelarEdicao();
-
-  /*
-    Recarregamos a tabela para mostrar o nome atualizado.
-  */
+  mostrarMensagem("Sucesso ao atualizar item: " + descProduto, "sucesso");
   carregarProdutos();
 }
 
@@ -522,7 +499,7 @@ async function excluirProduto(Produto) {
     Se o Produto excluído era o mesmo que estava sendo editado,
     cancelamos a edição para limpar o formulário.
   */
-  if (ProdutoIdInput.value == Produto.produtoid) {
+  if (produtoIdInput.value == Produto.produtoid) {
     cancelarEdicao();
   }
 
@@ -560,10 +537,10 @@ formProduto.addEventListener("submit", async function(evento) {
     Se estiver preenchido:
     - é uma edição.
   */
-  const estaEditando = ProdutoIdInput.value !== "";
+  const estaEditando = produtoIdInput.value !== "";
 
   if (estaEditando) {
-    await atualizarNomeProduto();
+    await atualizarProduto();
   } else {
     await salvarProduto();
   }
