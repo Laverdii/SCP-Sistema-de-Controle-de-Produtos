@@ -7,10 +7,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_2tOQkWcuI6Xd06OEEG9D1w_Esm6_e9j";
   A variável "supabase" vem da biblioteca que carregamos no HTML:
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 */
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /*
   ============================================
@@ -150,7 +147,7 @@ async function carregarCategorias() {
 
     Para cada Categoria, criamos uma linha <tr>.
   */
-  data.forEach(function(Categoria) {
+  data.forEach(function (Categoria) {
     const linha = document.createElement("tr");
 
     /*
@@ -182,7 +179,7 @@ async function carregarCategorias() {
       chamamos a função prepararEdicao
       passando o Categoria da linha atual.
     */
-    botaoEditar.addEventListener("click", function() {
+    botaoEditar.addEventListener("click", function () {
       prepararEdicao(Categoria);
     });
 
@@ -203,7 +200,7 @@ async function carregarCategorias() {
       chamamos a função excluirCategoria
       passando o Categoria da linha atual.
     */
-    botaoExcluir.addEventListener("click", function() {
+    botaoExcluir.addEventListener("click", function () {
       excluirCategoria(Categoria);
     });
 
@@ -242,7 +239,6 @@ function prepararEdicao(Categoria) {
   */
   descCategoriaInput.value = Categoria.ds_categoria_produto;
 
-
   /*
     Neste exemplo, vamos permitir editar apenas o nome.
 
@@ -251,7 +247,6 @@ function prepararEdicao(Categoria) {
     - bloqueamos o CPF/CNPJ.
   */
   CategoriaIdInput.readOnly = true;
-  
 
   /*
     Mudamos o texto do botão principal para "Atualizar".
@@ -266,7 +261,10 @@ function prepararEdicao(Categoria) {
   /*
     Mostramos uma mensagem informando que o usuário está editando.
   */
-  mostrarMensagem("Editando o Categoria: " + Categoria.ds_categoria_produto, "sucesso");
+  mostrarMensagem(
+    "Editando o Categoria: " + Categoria.ds_categoria_produto,
+    "sucesso",
+  );
 }
 
 /*
@@ -366,7 +364,6 @@ async function salvarCategoria() {
     return;
   }
 
-
   /*
     Antes de inserir, verificamos se o CPF/CNPJ já está cadastrado.
   */
@@ -387,7 +384,10 @@ async function salvarCategoria() {
   try {
     proximoCategoriaId = await buscarProximoCategoriaIdDisponivel();
   } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
+    mostrarMensagem(
+      "Erro ao calcular o próximo código: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -468,7 +468,7 @@ async function atualizarNomeCategoria() {
   const { error } = await supabaseClient
     .from("categoria_produto")
     .update({
-      ds_categoria_produto: descCategoria
+      ds_categoria_produto: descCategoria,
     })
     .eq("categoriaprodutoid", CategoriaId);
 
@@ -517,7 +517,9 @@ async function excluirCategoria(Categoria) {
     - false se o usuário clicar em Cancelar.
   */
   const confirmou = confirm(
-    "Tem certeza que deseja excluir a categoria " + Categoria.ds_categoria_produto + "?"
+    "Tem certeza que deseja excluir a categoria " +
+      Categoria.ds_categoria_produto +
+      "?",
   );
 
   /*
@@ -573,7 +575,7 @@ async function excluirCategoria(Categoria) {
   Este evento acontece quando o usuário clica em Salvar ou Atualizar.
 */
 
-formCategoria.addEventListener("submit", async function(evento) {
+formCategoria.addEventListener("submit", async function (evento) {
   /*
     Impede a página de recarregar ao enviar o formulário.
   */
@@ -606,7 +608,7 @@ formCategoria.addEventListener("submit", async function(evento) {
   chamamos a função cancelarEdicao.
 */
 
-btnCancelarEdicao.addEventListener("click", function() {
+btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 

@@ -7,10 +7,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_2tOQkWcuI6Xd06OEEG9D1w_Esm6_e9j";
   A variável "supabase" vem da biblioteca que carregamos no HTML:
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 */
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /*
   ============================================
@@ -176,7 +173,7 @@ async function carregarClientes() {
 
     Para cada cliente, criamos uma linha <tr>.
   */
-  data.forEach(function(cliente) {
+  data.forEach(function (cliente) {
     const linha = document.createElement("tr");
 
     /*
@@ -210,7 +207,7 @@ async function carregarClientes() {
       chamamos a função prepararEdicao
       passando o cliente da linha atual.
     */
-    botaoEditar.addEventListener("click", function() {
+    botaoEditar.addEventListener("click", function () {
       prepararEdicao(cliente);
     });
 
@@ -231,7 +228,7 @@ async function carregarClientes() {
       chamamos a função excluirCliente
       passando o cliente da linha atual.
     */
-    botaoExcluir.addEventListener("click", function() {
+    botaoExcluir.addEventListener("click", function () {
       excluirCliente(cliente);
     });
 
@@ -363,7 +360,10 @@ async function salvarCliente() {
   try {
     proximoClienteId = await buscarProximoClienteIdDisponivel();
   } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
+    mostrarMensagem(
+      "Erro ao calcular o próximo código: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -376,15 +376,13 @@ async function salvarCliente() {
     clienteid: proximoClienteId,
     tipo_cliente: tipoCliente,
     cpf_cnpj_cliente: cpfCnpjCliente,
-    nome_cliente: nomeCliente
+    nome_cliente: nomeCliente,
   };
 
   /*
     Insere o novo cliente na tabela cliente.
   */
-  const { error } = await supabaseClient
-    .from("cliente")
-    .insert(novoCliente);
+  const { error } = await supabaseClient.from("cliente").insert(novoCliente);
 
   /*
     Se houver erro, mostramos a mensagem e paramos a função.
@@ -440,7 +438,7 @@ async function atualizarNomeCliente() {
   const { error } = await supabaseClient
     .from("cliente")
     .update({
-      nome_cliente: nomeCliente
+      nome_cliente: nomeCliente,
     })
     .eq("clienteid", clienteId);
 
@@ -489,7 +487,7 @@ async function excluirCliente(cliente) {
     - false se o usuário clicar em Cancelar.
   */
   const confirmou = confirm(
-    "Tem certeza que deseja excluir o cliente " + cliente.nome_cliente + "?"
+    "Tem certeza que deseja excluir o cliente " + cliente.nome_cliente + "?",
   );
 
   /*
@@ -545,7 +543,7 @@ async function excluirCliente(cliente) {
   Este evento acontece quando o usuário clica em Salvar ou Atualizar.
 */
 
-formCliente.addEventListener("submit", async function(evento) {
+formCliente.addEventListener("submit", async function (evento) {
   /*
     Impede a página de recarregar ao enviar o formulário.
   */
@@ -578,7 +576,7 @@ formCliente.addEventListener("submit", async function(evento) {
   chamamos a função cancelarEdicao.
 */
 
-btnCancelarEdicao.addEventListener("click", function() {
+btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 

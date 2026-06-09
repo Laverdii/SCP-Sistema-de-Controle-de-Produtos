@@ -1,122 +1,147 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cadastro de produtos</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="icon" href="../img/favicon.ico" sizes="any">
-</head>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="icon" href="../img/favicon.ico" sizes="any" />
+  </head>
 
-<body>
+  <body>
     <nav class="navbar">
-        <ul>
-            <li><a href="home.html">Ínicio</a></li>
-            <li><a href="cadastrodeclientes.html">Clientes</a></li>
-            <li><a href="cadastrodecategorias.html">Categorias</a></li>
-            <li><a class="ativo" href="cadastrodeprodutos.html">Produtos</a></li>
-            <li><a href="orcamento.html">Orçamento</a></li>
-            <li><a href="telalogin.html">Sair</a></li>
-        </ul>
+      <ul>
+        <li><a href="home.html">Ínicio</a></li>
+        <li><a href="cadastrodeclientes.html">Clientes</a></li>
+        <li><a href="cadastrodecategorias.html">Categorias</a></li>
+        <li><a class="ativo" href="cadastrodeprodutos.html">Produtos</a></li>
+        <li><a href="orcamento.html">Orçamento</a></li>
+        <li><a href="telalogin.html">Sair</a></li>
+      </ul>
     </nav>
     <main class="container">
-        <h1>Cadastro de Produtos</h1>
-        <form id="formProduto" class="form-produto">
-            <!-- O campo "Código" é gerado automaticamente, por isso é readonly. -->
-            <div class="campo">
-                <label for="produtoId">Código:</label>
-                <input type="text" id="produtoId" name="produtoId" readonly placeholder="Gerado automaticamente">
-            </div> 
+      <h1>Cadastro de Produtos</h1>
+      <form id="formProduto" class="form-produto">
+        <!-- O campo "Código" é gerado automaticamente, por isso é readonly. -->
+        <div class="campo">
+          <label for="produtoId">Código:</label>
+          <input
+            type="text"
+            id="produtoId"
+            name="produtoId"
+            readonly
+            placeholder="Gerado automaticamente"
+          />
+        </div>
 
-            <div class="campo">
-                <label for="categoriaProduto">Categoria:</label>
-                <select id="categoriaProduto" name="categoriaProduto" required>
-                    <option value="">Selecione</option>
-                    <!-- As opções de categoria serão carregadas dinamicamente pelo JavaScript -->
-                </select>
-            </div>
+        <div class="campo">
+          <label for="categoriaProduto">Categoria:</label>
+          <select id="categoriaProduto" name="categoriaProduto" required>
+            <option value="">Selecione</option>
+            <!-- As opções de categoria serão carregadas dinamicamente pelo JavaScript -->
+          </select>
+        </div>
 
-            <div class="campo">
-                <label for="descProduto">Descrição:</label>
-                <input type="text" id="descProduto" name="descProduto" required placeholder="Digite a descrição do produto">
-            </div>
+        <div class="campo">
+          <label for="descProduto">Descrição:</label>
+          <input
+            type="text"
+            id="descProduto"
+            name="descProduto"
+            required
+            placeholder="Digite a descrição do produto"
+          />
+        </div>
 
-            <div class="campo">
-                <label for="obsProduto">Observação:</label>
-                <input type="text" id="obsProduto" name="obsProduto" required placeholder="Digite uma Observação ao produto">
-            </div>
+        <div class="campo">
+          <label for="obsProduto">Observação:</label>
+          <input
+            type="text"
+            id="obsProduto"
+            name="obsProduto"
+            required
+            placeholder="Digite uma Observação ao produto"
+          />
+        </div>
 
-            <div class="campo">
-                <label for="valorProduto">Valor de venda:</label>
-                <input type="number" id="valorProduto" name="valorProduto" step="0.01" required placeholder="Digite o preço do produto">
-            </div>
+        <div class="campo">
+          <label for="valorProduto">Valor de venda:</label>
+          <input
+            type="number"
+            id="valorProduto"
+            name="valorProduto"
+            step="0.01"
+            required
+            placeholder="Digite o preço do produto"
+          />
+        </div>
 
-            <div class="campo">
-                <label for="dataCadastro">Data do cadastro:</label>
-                <input type="date" id="dataCadastro" name="dataCadastro" required>
-            </div>
+        <div class="campo">
+          <label for="dataCadastro">Data do cadastro:</label>
+          <input type="date" id="dataCadastro" name="dataCadastro" required />
+        </div>
 
-            <div class="campo">
-                <label for="statusProduto">Status:</label>
-                <select id="statusProduto" name="statusProduto" required>
-                    <option value="">Selecione</option>
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                </select>
-            </div>
-            
-            <!-- Botões do formulário -->
-            <div class="acoes">
-                <button type="reset" class="btn-limpar">
-                    Limpar
-                </button>
+        <div class="campo">
+          <label for="statusProduto">Status:</label>
+          <select id="statusProduto" name="statusProduto" required>
+            <option value="">Selecione</option>
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
 
-                <button type="button" id="btnCancelarEdicao" class="btn-cancelar-edicao">
-                    Cancelar edição
-                </button>
+        <!-- Botões do formulário -->
+        <div class="acoes">
+          <button type="reset" class="btn-limpar">Limpar</button>
 
-                <button type="submit" id="btnSalvar" class="btn-salvar">
-                    Salvar
-                </button>
-            </div>
-        </form>
+          <button
+            type="button"
+            id="btnCancelarEdicao"
+            class="btn-cancelar-edicao"
+          >
+            Cancelar edição
+          </button>
 
-        <!-- Aqui aparecerão mensagens como: "Produto salvo com sucesso" "Erro ao salvar produto" "Produto excluído com sucesso" -->
-        <p id="mensagem" class="mensagem"></p>
-        <h2>Produtos Cadastrados</h2>
+          <button type="submit" id="btnSalvar" class="btn-salvar">
+            Salvar
+          </button>
+        </div>
+      </form>
 
-        <!-- Tabela onde os produtos serão exibidos -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Categoria</th>
-                    <th>Descrição</th>
-                    <th>Observação</th>
-                    <th>Preço</th>
-                    <th>Data de Cadastro</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+      <!-- Aqui aparecerão mensagens como: "Produto salvo com sucesso" "Erro ao salvar produto" "Produto excluído com sucesso" -->
+      <p id="mensagem" class="mensagem"></p>
+      <h2>Produtos Cadastrados</h2>
 
-            <!-- O tbody começa com uma mensagem.
+      <!-- Tabela onde os produtos serão exibidos -->
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Categoria</th>
+            <th>Descrição</th>
+            <th>Observação</th>
+            <th>Preço</th>
+            <th>Data de Cadastro</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <!-- O tbody começa com uma mensagem.
            Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
-            <tbody id="tabelaProdutos">
-                <tr>
-                    <td colspan="8">Carregando produtos...</td>
-                </tr>
-            </tbody>
-        </table>
-        <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <tbody id="tabelaProdutos">
+          <tr>
+            <td colspan="8">Carregando produtos...</td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <!-- Nosso arquivo JavaScript separado -->
-        <script src="../JS/produtos.js"></script>
+      <!-- Nosso arquivo JavaScript separado -->
+      <script src="../JS/produtos.js"></script>
     </main>
-</body>
-
+  </body>
 </html>
 
 <!-- FALTA O JS COM OS BOTEOES EXLUIR E EDITAR-->

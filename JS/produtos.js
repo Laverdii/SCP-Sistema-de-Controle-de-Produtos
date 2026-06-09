@@ -7,10 +7,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_2tOQkWcuI6Xd06OEEG9D1w_Esm6_e9j";
   A variável "supabase" vem da biblioteca que carregamos no HTML:
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 */
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /*
   ============================================
@@ -28,9 +25,9 @@ const mensagem = document.getElementById("mensagem");
 const ProdutoIdInput = document.getElementById("ProdutoId");
 const categoriaProdutoInput = document.getElementById("categoriaProduto");
 const descProduto = document.getElementById("descProduto");
-const obsProduto = document.getElementById("")
+const obsProduto = document.getElementById("");
 const valorProdutoInput = document.getElementById("valorProduto");
-const dataCadastroInput = document.getElementById("dataCadastro")
+const dataCadastroInput = document.getElementById("dataCadastro");
 
 const btnSalvar = document.getElementById("btnSalvar");
 const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
@@ -125,7 +122,7 @@ async function carregarCategoriasDoSelect() {
 
   categoriaProdutoInput.innerHTML = `<option value="">Selecione</option>`;
 
-  data.forEach(function(categoria) {
+  data.forEach(function (categoria) {
     const option = document.createElement("option");
 
     option.value = categoria.categoriaprodutoid;
@@ -135,11 +132,12 @@ async function carregarCategoriasDoSelect() {
   });
 }
 
-
 async function carregarProdutos() {
   const { data, error } = await supabaseClient
     .from("produto")
-    .select("produtoid, categoriaprodutoid, ds_produto, obs_produto, vl_venda_produto, dt_cadastro_produto, status_produto")
+    .select(
+      "produtoid, categoriaprodutoid, ds_produto, obs_produto, vl_venda_produto, dt_cadastro_produto, status_produto",
+    )
     .order("produtoid", { ascending: true });
 
   /*
@@ -181,7 +179,7 @@ async function carregarProdutos() {
 
     Para cada Produto, criamos uma linha <tr>.
   */
-  data.forEach(function(Produto) {
+  data.forEach(function (Produto) {
     const linha = document.createElement("tr");
 
     /*
@@ -218,7 +216,7 @@ async function carregarProdutos() {
       chamamos a função prepararEdicao
       passando o Produto da linha atual.
     */
-    botaoEditar.addEventListener("click", function() {
+    botaoEditar.addEventListener("click", function () {
       prepararEdicao(Produto);
     });
 
@@ -239,7 +237,7 @@ async function carregarProdutos() {
       chamamos a função excluirProduto
       passando o Produto da linha atual.
     */
-    botaoExcluir.addEventListener("click", function() {
+    botaoExcluir.addEventListener("click", function () {
       excluirProduto(Produto);
     });
 
@@ -293,7 +291,13 @@ function prepararEdicao(Produto) {
   /*
     Mostramos uma mensagem informando que o usuário está editando.
   */
-  mostrarMensagem("Editando o Produto: " + Produto.obs_produto + " - " + Produto.ds_produto + "sucesso");
+  mostrarMensagem(
+    "Editando o Produto: " +
+      Produto.obs_produto +
+      " - " +
+      Produto.ds_produto +
+      "sucesso",
+  );
 }
 
 /*
@@ -347,7 +351,7 @@ async function salvarProduto() {
   /*
     Pegamos os valores digitados no formulário.
   */
- 
+
   const categoriaProduto = categoriaProdutoInput.value;
   const descProduto = descProduto.value;
   const obsProduto = obsProduto.value;
@@ -359,7 +363,10 @@ async function salvarProduto() {
   try {
     proximoProdutoId = await buscarProximoProdutoIdDisponivel();
   } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
+    mostrarMensagem(
+      "Erro ao calcular o próximo código: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -376,15 +383,13 @@ async function salvarProduto() {
     obs_produto: obsProduto,
     vl_venda_produto: valorProduto,
     dt_cadastro_produto: dataCadastro,
-    status_produto: statusProduto
+    status_produto: statusProduto,
   };
 
   /*
     Insere o novo Produto na tabela Produto.
   */
-  const { error } = await supabaseClient
-    .from("produto")
-    .insert(novoProduto);
+  const { error } = await supabaseClient.from("produto").insert(novoProduto);
 
   /*
     Se houver erro, mostramos a mensagem e paramos a função.
@@ -440,7 +445,7 @@ async function atualizarNomeProduto() {
   const { error } = await supabaseClient
     .from("produto")
     .update({
-      ds_produto: ds_Produto
+      ds_produto: ds_Produto,
     })
     .eq("produtoid", ProdutoId);
 
@@ -489,7 +494,11 @@ async function excluirProduto(Produto) {
     - false se o usuário clicar em Cancelar.
   */
   const confirmou = confirm(
-    "Tem certeza que deseja excluir o produto " + Produto.ds_produto + " - " + Produto.obs_produto + "?"
+    "Tem certeza que deseja excluir o produto " +
+      Produto.ds_produto +
+      " - " +
+      Produto.obs_produto +
+      "?",
   );
 
   /*
@@ -545,7 +554,7 @@ async function excluirProduto(Produto) {
   Este evento acontece quando o usuário clica em Salvar ou Atualizar.
 */
 
-formProduto.addEventListener("submit", async function(evento) {
+formProduto.addEventListener("submit", async function (evento) {
   /*
     Impede a página de recarregar ao enviar o formulário.
   */
@@ -578,7 +587,7 @@ formProduto.addEventListener("submit", async function(evento) {
   chamamos a função cancelarEdicao.
 */
 
-btnCancelarEdicao.addEventListener("click", function() {
+btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 
