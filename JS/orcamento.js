@@ -28,6 +28,7 @@ const quantidadeItemOrcamentoInput = document.getElementById(
 const produtoOriginalItemInput = document.getElementById("produtoOriginalItem");
 const btnCancelarItem = document.getElementById("btnCancelarItem");
 const btnSalvarItem = document.getElementById("btnSalvarItem");
+const thAcoes = document.getElementById("thAcoes");
 
 const DIAS_VALIDADE_ORCAMENTO = 7;
 
@@ -58,16 +59,13 @@ function preencherDatasAutomaticas() {
 }
 
 function limparTabelaItens(texto) {
-  tabelaOrcamentos.innerHTML = `
-    <tr>
-      <td colspan="6">${texto}</td>
-    </tr>
-  `;
+  const colspan = thAcoes.parentElement ? 6 : 5;
+  tabelaOrcamentos.innerHTML = `<tr><td colspan="${colspan}">${texto}</td></tr>`;
 }
 
 function atualizarEstadoBotaoAtribuir() {
   if (orcamentoIdInput.value) {
-    btnSalvar.textContent = "Orçamento atribuido";
+    btnSalvar.textContent = "Orçamento atribuído";
     btnSalvar.disabled = true;
     return;
   }
@@ -88,7 +86,14 @@ function atualizarEstadoEdicaoItens() {
 
   formItemOrcamento.style.display =
     editandoItens && temOrcamento ? "grid" : "none";
-  btnEditarItens.textContent = editandoItens ? "Fechar edicao" : "Editar itens";
+  btnEditarItens.textContent = editandoItens ? "Fechar edição" : "Editar itens";
+
+  const modoEdicaoAtivo = editandoItens && temOrcamento;
+  if (modoEdicaoAtivo && !thAcoes.parentElement) {
+    tabelaOrcamentos.closest("table").tHead.rows[0].appendChild(thAcoes);
+  } else if (!modoEdicaoAtivo) {
+    thAcoes.remove();
+  }
 }
 
 function preencherFormularioComOrcamento(orcamento) {
@@ -345,10 +350,11 @@ async function carregarItensOrcamento() {
       <td>${item.qt_produto}</td>
       <td>${Number(item.vl_unitario || 0).toFixed(2)}</td>
       <td>${Number(item.vl_total || 0).toFixed(2)}</td>
-      <td class="coluna-acoes"></td>
     `;
 
     if (editandoItens) {
+      const tdAcoes = document.createElement("td");
+
       const botaoEditar = document.createElement("button");
       botaoEditar.textContent = "Editar";
       botaoEditar.className = "btn-editar";
@@ -365,8 +371,9 @@ async function carregarItensOrcamento() {
         excluirItemOrcamento(item);
       });
 
-      linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
-      linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
+      tdAcoes.appendChild(botaoEditar);
+      tdAcoes.appendChild(botaoExcluir);
+      linha.appendChild(tdAcoes);
     }
 
     tabelaOrcamentos.appendChild(linha);
@@ -565,7 +572,7 @@ async function atribuirOrcamentoAoCliente() {
   if (orcamentoExistente) {
     preencherFormularioComOrcamento(orcamentoExistente);
     mostrarMensagem(
-      "Este cliente ja possui um orçamento atribuido.",
+      "Este cliente ja possui um orçamento atríbuido.",
       "sucesso",
     );
     carregarItensOrcamento();
@@ -605,7 +612,7 @@ async function atribuirOrcamentoAoCliente() {
   }
 
   preencherFormularioComOrcamento(data);
-  mostrarMensagem("Orçamento atribuido ao cliente com sucesso!", "sucesso");
+  mostrarMensagem("Orçamento atribuído ao cliente com sucesso!", "sucesso");
   carregarItensOrcamento();
 }
 
