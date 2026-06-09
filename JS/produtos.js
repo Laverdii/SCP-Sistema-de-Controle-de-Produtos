@@ -22,12 +22,13 @@ const formProduto = document.getElementById("formProduto");
 const tabelaProdutos = document.getElementById("tabelaProdutos");
 const mensagem = document.getElementById("mensagem");
 
-const ProdutoIdInput = document.getElementById("ProdutoId");
+const ProdutoIdInput = document.getElementById("produtoId");
 const categoriaProdutoInput = document.getElementById("categoriaProduto");
-const descProduto = document.getElementById("descProduto");
-const obsProduto = document.getElementById("");
+const descProdutoInput = document.getElementById("descProduto");
+const obsProdutoInput = document.getElementById("obsProduto");
 const valorProdutoInput = document.getElementById("valorProduto");
 const dataCadastroInput = document.getElementById("dataCadastro");
+const statusProdutoInput = document.getElementById("statusProduto");
 
 const btnSalvar = document.getElementById("btnSalvar");
 const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
@@ -113,7 +114,7 @@ async function carregarCategoriasDoSelect() {
   const { data, error } = await supabaseClient
     .from("categoria_produto")
     .select("categoriaprodutoid, ds_categoria_produto")
-    .order("ds_categoria_produto", { ascending: true });
+    .order("categoriaprodutoid", { ascending: true });
 
   if (error) {
     mostrarMensagem("Erro ao carregar categorias: " + error.message, "erro");
@@ -274,9 +275,9 @@ function prepararEdicao(Produto) {
   /*
     Preenche os demais campos com os dados do Produto.
   */
-  descProduto.value = Produto.ds_produto;
-  obsProduto.value = Produto.obs_produto;
-  dataCadastroInput.value = Produto.nome_Produto;
+  descProdutoInput.value = Produto.ds_produto;
+  obsProdutoInput.value = Produto.obs_produto;
+  dataCadastroInput.value = Produto.dt_cadastro_produto;
 
   /*
     Mudamos o texto do botão principal para "Atualizar".
@@ -353,11 +354,11 @@ async function salvarProduto() {
   */
 
   const categoriaProduto = categoriaProdutoInput.value;
-  const descProduto = descProduto.value;
-  const obsProduto = obsProduto.value;
+  const descProduto = descProdutoInput.value;
+  const obsProduto = obsProdutoInput.value;
   const valorProduto = valorProdutoInput.value;
   const dataCadastro = dataCadastroInput.value;
-  const statusProduto = statusProduto.value;
+  const statusProduto = statusProdutoInput.value;
 
   let proximoProdutoId;
   try {
@@ -434,7 +435,7 @@ async function atualizarNomeProduto() {
   /*
     Pegamos o novo nome digitado.
   */
-  const ds_Produto = descProduto.value;
+  const ds_Produto = descProdutoInput.value;
 
   /*
     Atualizamos somente a coluna ds_produto.
@@ -569,12 +570,16 @@ formProduto.addEventListener("submit", async function (evento) {
     Se estiver preenchido:
     - é uma edição.
   */
-  const estaEditando = ProdutoIdInput.value !== "";
+  try {
+    const estaEditando = ProdutoIdInput.value !== "";
 
-  if (estaEditando) {
-    await atualizarNomeProduto();
-  } else {
-    await salvarProduto();
+    if (estaEditando) {
+      await atualizarNomeProduto();
+    } else {
+      await salvarProduto();
+    }
+  } catch (erro) {
+    mostrarMensagem("Erro inesperado: " + erro.message, "erro");
   }
 });
 
