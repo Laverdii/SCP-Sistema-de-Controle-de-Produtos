@@ -65,10 +65,10 @@ btnEntrar.addEventListener("click", async function () {
   }, 800);
 });
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        btnEntrar.click();
-    }
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    btnEntrar.click();
+  }
 });
 
 // Estado inicial: botão desabilitado

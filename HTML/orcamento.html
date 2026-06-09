@@ -1,135 +1,182 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Orçamento</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="icon" href="../img/favicon.ico" sizes="any">
-</head>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="icon" href="../img/favicon.ico" sizes="any" />
+  </head>
 
-<body>
+  <body>
     <nav class="navbar">
-        <ul>
-            <li><a href="home.html">Ínicio</a></li>
-            <li><a href="cadastrodeclientes.html">Clientes</a></li>
-            <li><a href="cadastrodecategorias.html">Categorias</a></li>
-            <li><a href="cadastrodeprodutos.html">Produtos</a></li>
-            <li><a class="ativo" href="orcamento.html">Orçamento</a></li>
-            <li><a href="telalogin.html">Sair</a></li>
-        </ul>
+      <ul>
+        <li><a href="home.html">Ínicio</a></li>
+        <li><a href="cadastrodeclientes.html">Clientes</a></li>
+        <li><a href="cadastrodecategorias.html">Categorias</a></li>
+        <li><a href="cadastrodeprodutos.html">Produtos</a></li>
+        <li><a class="ativo" href="orcamento.html">Orçamento</a></li>
+        <li><a href="telalogin.html">Sair</a></li>
+      </ul>
     </nav>
 
     <main class="container">
-        <h1>Orçamento</h1>
+      <h1>Orçamento</h1>
 
-        <form id="formOrcamento" class="form-orcamento">
-            <div class="campo">
-                <label for="OrcamentoId">Codigo do orçamento:</label>
-                <input type="text" id="OrcamentoId" name="codigo" readonly placeholder="Gerado automaticamente">
-            </div>
-
-            <div class="campo">
-                <label for="OrcamentoCliente">Cliente:</label>
-                <select id="OrcamentoCliente" name="Cliente" required>
-                    <option value="">Selecione</option>
-                </select>
-            </div>
-
-            <div class="campo">
-                <label for="dt_orcamento">Data do orçamento:</label>
-                <input type="date" id="dt_orcamento" name="dt_orcamento" required readonly placeholder="Gerado automaticamente">
-            </div>
-
-            <div class="campo">
-                <label for="dt_validade_orcamento">Data de validade do orçamento:</label>
-                <input type="date" id="dt_validade_orcamento" name="dt_validade_orcamento" readonly placeholder="Gerado automaticamente">
-            </div>
-
-            <div class="campo">
-                <label for="vl_total_orcamento">Valor total do orçamento:</label>
-                <input type="text" id="vl_total_orcamento" name="vl_total_orcamento" readonly placeholder="Gerado automaticamente">
-            </div>
-
-            <div class="acoes">
-                <button type="reset" class="btn-limpar">
-                    Limpar
-                </button>
-
-                <button type="button" id="btnCancelarEdicao" class="btn-cancelar-edicao">
-                    Cancelar edição
-                </button>
-
-                <button type="submit" id="btnSalvar" class="btn-salvar" disabled>
-                    Atribuir orçamento
-                </button>
-            </div>
-        </form>
-
-        <p id="mensagem" class="mensagem"></p>
-
-        <div class="cabecalho-itens-orcamento">
-            <h2>Itens do orçamento</h2>
-            <div class="acoes-orcamento">
-                <button type="button" id="btnEditarItens" class="btn-editar" style="display: none;">
-                    Editar itens
-                </button>
-
-                <button type="button" id="btnExcluirOrcamento" class="btn-excluir" style="display: none;">
-                    Excluir
-                </button>
-            </div>
+      <form id="formOrcamento" class="form-orcamento">
+        <div class="campo">
+          <label for="OrcamentoId">Codigo do orçamento:</label>
+          <input
+            type="text"
+            id="OrcamentoId"
+            name="codigo"
+            readonly
+            placeholder="Gerado automaticamente"
+          />
         </div>
 
-        <form id="formItemOrcamento" class="form-item-orcamento" style="display: none;">
-            <input type="hidden" id="produtoOriginalItem">
+        <div class="campo">
+          <label for="OrcamentoCliente">Cliente:</label>
+          <select id="OrcamentoCliente" name="Cliente" required>
+            <option value="">Selecione</option>
+          </select>
+        </div>
 
-            <div class="campo">
-                <label for="produtoItemOrcamento">Produto:</label>
-                <select id="produtoItemOrcamento" required>
-                    <option value="">Selecione</option>
-                </select>
-            </div>
+        <div class="campo">
+          <label for="dt_orcamento">Data do orçamento:</label>
+          <input
+            type="date"
+            id="dt_orcamento"
+            name="dt_orcamento"
+            required
+            readonly
+            placeholder="Gerado automaticamente"
+          />
+        </div>
 
-            <div class="campo">
-                <label for="quantidadeItemOrcamento">Quantidade:</label>
-                <input type="number" id="quantidadeItemOrcamento" min="1" step="1" required>
-            </div>
+        <div class="campo">
+          <label for="dt_validade_orcamento"
+            >Data de validade do orçamento:</label
+          >
+          <input
+            type="date"
+            id="dt_validade_orcamento"
+            name="dt_validade_orcamento"
+            readonly
+            placeholder="Gerado automaticamente"
+          />
+        </div>
 
-            <div class="acoes">
-                <button type="button" id="btnCancelarItem" class="btn-limpar">
-                    Cancelar item
-                </button>
+        <div class="campo">
+          <label for="vl_total_orcamento">Valor total do orçamento:</label>
+          <input
+            type="text"
+            id="vl_total_orcamento"
+            name="vl_total_orcamento"
+            readonly
+            placeholder="Gerado automaticamente"
+          />
+        </div>
 
-                <button type="submit" id="btnSalvarItem" class="btn-salvar">
-                    Adicionar item
-                </button>
-            </div>
-        </form>
+        <div class="acoes">
+          <button type="reset" class="btn-limpar">Limpar</button>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Descricao do produto</th>
-                    <th>Qntd.</th>
-                    <th>Valor unitario</th>
-                    <th>Valor total</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+          <button
+            type="button"
+            id="btnCancelarEdicao"
+            class="btn-cancelar-edicao"
+          >
+            Cancelar edição
+          </button>
 
-            <tbody id="tabelaOrcamento">
-                <tr>
-                    <td colspan="6">Carregando itens do orçamento...</td>
-                </tr>
-            </tbody>
-        </table>
+          <button type="submit" id="btnSalvar" class="btn-salvar" disabled>
+            Atribuir orçamento
+          </button>
+        </div>
+      </form>
 
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <script src="../JS/orcamento.js"></script>
+      <p id="mensagem" class="mensagem"></p>
+
+      <div class="cabecalho-itens-orcamento">
+        <h2>Itens do orçamento</h2>
+        <div class="acoes-orcamento">
+          <button
+            type="button"
+            id="btnEditarItens"
+            class="btn-editar"
+            style="display: none"
+          >
+            Editar itens
+          </button>
+
+          <button
+            type="button"
+            id="btnExcluirOrcamento"
+            class="btn-excluir"
+            style="display: none"
+          >
+            Excluir
+          </button>
+        </div>
+      </div>
+
+      <form
+        id="formItemOrcamento"
+        class="form-item-orcamento"
+        style="display: none"
+      >
+        <input type="hidden" id="produtoOriginalItem" />
+
+        <div class="campo">
+          <label for="produtoItemOrcamento">Produto:</label>
+          <select id="produtoItemOrcamento" required>
+            <option value="">Selecione</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="quantidadeItemOrcamento">Quantidade:</label>
+          <input
+            type="number"
+            id="quantidadeItemOrcamento"
+            min="1"
+            step="1"
+            required
+          />
+        </div>
+
+        <div class="acoes">
+          <button type="button" id="btnCancelarItem" class="btn-limpar">
+            Cancelar item
+          </button>
+
+          <button type="submit" id="btnSalvarItem" class="btn-salvar">
+            Adicionar item
+          </button>
+        </div>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Descricao do produto</th>
+            <th>Qntd.</th>
+            <th>Valor unitario</th>
+            <th>Valor total</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody id="tabelaOrcamento">
+          <tr>
+            <td colspan="6">Carregando itens do orçamento...</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <script src="../JS/orcamento.js"></script>
     </main>
-</body>
-
+  </body>
 </html>

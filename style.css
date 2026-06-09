@@ -1,295 +1,299 @@
- /* Estilo geral da página */
- body {
-     font-family: Arial, Helvetica, sans-serif;
-     background: #f4f4f4;
-     margin: 0;
-     padding: 0 30px 30px;
- }
+/* Estilo geral da página */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0 30px 30px;
+}
 
- .navbar {
-     background: #356fa1;
-     margin: 0 -30px 30px;
-     width: calc(100% + 60px);
- }
+.navbar {
+  background: #356fa1;
+  margin: 0 -30px 30px;
+  width: calc(100% + 60px);
+}
 
- .navbar ul {
-     display: flex;
-     flex-wrap: wrap;
-     justify-content: center;
-     gap: 6px;
-     list-style: none;
-     margin: 0;
-     padding: 10px 20px;
- }
+.navbar ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 10px 20px;
+}
 
- .navbar a {
-     color: rgb(255, 255, 255);;
-     display: block;
-     font-weight: bold;
-     padding: 8px 12px;
-     text-decoration: none;
-     border-radius: 5px;
- }
+.navbar a {
+  color: rgb(255, 255, 255);
+  display: block;
+  font-weight: bold;
+  padding: 8px 12px;
+  text-decoration: none;
+  border-radius: 5px;
+}
 
- .navbar a:hover,
- .navbar a.ativo {
-     background: rgba(255, 255, 255, 0.18);
- }
+.navbar a:hover,
+.navbar a.ativo {
+  background: rgba(255, 255, 255, 0.18);
+}
 
- /* Caixa principal onde fica todo o conteúdo */
- .container-login {
-     max-width: 400px;
-     width: 100%;
-     margin: 0 auto;
-     background: white;
-     padding: 25px;
-     border-radius: 8px;
- }
+/* Caixa principal onde fica todo o conteúdo */
+.container-login {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+}
 
- .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background:white;
-    padding: 25px;
-    border-radius: 8px;
- }
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+}
 
- /* Espaçamento dos títulos */
- h1, h2 {
-     margin-bottom: 15px;
- }
+/* Espaçamento dos títulos */
+h1,
+h2 {
+  margin-bottom: 15px;
+}
 
- /* Formulário organizado em duas colunas */
- .form-cliente, .form-categoria, .form-produto {
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     gap: 10px;
-     margin-bottom: 15px;
- }
+/* Formulário organizado em duas colunas */
+.form-cliente,
+.form-categoria,
+.form-produto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
 .body-login {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 30px;
-    transform: translateY(-150px);
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  transform: translateY(-150px);
 }
 
-.box-login>h1 {
-    text-align: center;
+.box-login > h1 {
+  text-align: center;
 }
 
- .box-login {
-     display: flex;
-     flex-direction: column;
-     gap: 10px;
-     margin-bottom: 15px;
- }
+.box-login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
- .box-home {
-     display: flex;
-     flex-direction: column;
-     gap: 10px;
-     margin-bottom: 15px;
-     text-align: center;
- }
+.box-home {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+  text-align: center;
+}
 
 .box-home button {
-    text-align: center;
-    display: inline-block;
-    min-width: 400px; 
-    text-align: center;
-    padding: 10px;
-    text-align: center;
- }
+  text-align: center;
+  display: inline-block;
+  min-width: 400px;
+  text-align: center;
+  padding: 10px;
+  text-align: center;
+}
 
- .box-home>a {
-     display: inline-block;
-     min-width: 200px;
-     text-align: center;
- }
+.box-home > a {
+  display: inline-block;
+  min-width: 200px;
+  text-align: center;
+}
 
- /* Cada campo fica em formato vertical:
+/* Cada campo fica em formato vertical:
        label em cima e input embaixo */
- .campo {
-     display: flex;
-     flex-direction: column;
- }
+.campo {
+  display: flex;
+  flex-direction: column;
+}
 
- .campo label {
-     margin-bottom: 5px;
-     font-weight: bold;
- }
+.campo label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
 
- .campo input,
- .campo select {
-     padding: 10px;
-     border: 1px solid #ccc;
-     border-radius: 5px;
- }
+.campo input,
+.campo select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
 
- /* O campo nome ocupa as duas colunas do formulário */
- .campo.nome {
-     grid-column: span 2;
- }
+/* O campo nome ocupa as duas colunas do formulário */
+.campo.nome {
+  grid-column: span 2;
+}
 
- /* Área onde ficam os botões do formulário */
- .acoes {
-     grid-column: span 2;
-     text-align: right;
- }
+/* Área onde ficam os botões do formulário */
+.acoes {
+  grid-column: span 2;
+  text-align: right;
+}
 
- /* Estilo base dos botões */
- button {
-     padding: 10px 16px;
-     border: none;
-     border-radius: 5px;
-     cursor: pointer;
- }
+/* Estilo base dos botões */
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
- .form-orcamento button:disabled,
- .form-item-orcamento button:disabled {
-     cursor: not-allowed;
-     opacity: 0.65;
- }
+.form-orcamento button:disabled,
+.form-item-orcamento button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
 
- .form-orcamento,
- .form-item-orcamento {
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     gap: 10px;
-     margin-bottom: 15px;
- }
+.form-orcamento,
+.form-item-orcamento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
- .cabecalho-itens-orcamento {
-     align-items: center;
-     display: flex;
-     gap: 10px;
-     justify-content: space-between;
-     margin-top: 10px;
- }
+.cabecalho-itens-orcamento {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 10px;
+}
 
- .cabecalho-itens-orcamento h2 {
-     margin-bottom: 15px;
- }
+.cabecalho-itens-orcamento h2 {
+  margin-bottom: 15px;
+}
 
- .acoes-orcamento {
-     align-items: center;
-     display: flex;
-     gap: 6px;
- }
+.acoes-orcamento {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
 
- .acoes-orcamento .btn-editar,
- .acoes-orcamento .btn-excluir {
-     margin-right: 0;
- }
+.acoes-orcamento .btn-editar,
+.acoes-orcamento .btn-excluir {
+  margin-right: 0;
+}
 
- /* Botão salvar/atualizar */
- .btn-salvar, .btn-abas {
-     background: #356fa1;
-     color: rgb(255, 255, 255);
- }
+/* Botão salvar/atualizar */
+.btn-salvar,
+.btn-abas {
+  background: #356fa1;
+  color: rgb(255, 255, 255);
+}
 
- /* Botão limpar */
- .btn-limpar {
-     background: #ddd;
- }
+/* Botão limpar */
+.btn-limpar {
+  background: #ddd;
+}
 
- /* Botão editar que aparece dentro da tabela */
- .btn-editar {
-     background: #ff9c07;
-     color: #333;
-     padding: 6px 10px;
-     margin-right: 5px;
- }
+/* Botão editar que aparece dentro da tabela */
+.btn-editar {
+  background: #ff9c07;
+  color: #333;
+  padding: 6px 10px;
+  margin-right: 5px;
+}
 
- /* Botão excluir que aparece dentro da tabela */
- .btn-excluir {
-     background: #dc3545;
-     color: white;
-     padding: 6px 10px;
- }
+/* Botão excluir que aparece dentro da tabela */
+.btn-excluir {
+  background: #dc3545;
+  color: white;
+  padding: 6px 10px;
+}
 
- /* Botão cancelar edição.
+/* Botão cancelar edição.
        Começa escondido e só aparece quando o usuário clica em editar. */
- .btn-cancelar-edicao {
-     background: #356fa1;
-     color: white;
-     display: none;
- }
+.btn-cancelar-edicao {
+  background: #356fa1;
+  color: white;
+  display: none;
+}
 
- /* Área de mensagem de sucesso ou erro */
- .mensagem {
-     font-weight: bold;
-     margin-bottom: 15px;
- }
+/* Área de mensagem de sucesso ou erro */
+.mensagem {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
 
- .sucesso {
-     color: green;
- }
+.sucesso {
+  color: green;
+}
 
- .erro {
-     color: red;
- }
+.erro {
+  color: red;
+}
 
- /* Estilo da tabela */
- table {
-     width: 100%;
-     border-collapse: collapse;
- }
+/* Estilo da tabela */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
- th {
-     background: #356fa1;
-     color: white;
- }
+th {
+  background: #356fa1;
+  color: white;
+}
 
- th,
- td {
-     padding: 10px;
-     border: 1px solid #ddd;
-     text-align: left;
- }
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
 
- /* Ajuste para telas pequenas */
- @media (max-width: 700px) {
-     body {
-         padding: 0 15px 20px;
-     }
+/* Ajuste para telas pequenas */
+@media (max-width: 700px) {
+  body {
+    padding: 0 15px 20px;
+  }
 
-     .navbar {
-         margin: 0 -15px 20px;
-         width: calc(100% + 30px);
-     }
+  .navbar {
+    margin: 0 -15px 20px;
+    width: calc(100% + 30px);
+  }
 
-     .navbar ul {
-         justify-content: flex-start;
-         padding: 8px 12px;
-     }
+  .navbar ul {
+    justify-content: flex-start;
+    padding: 8px 12px;
+  }
 
-     .navbar a {
-         font-size: 14px;
-         padding: 8px 10px;
-     }
+  .navbar a {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
 
-     .form-cliente,
-     .form-categoria,
-     .form-produto,
-     .form-orcamento,
-     .form-item-orcamento {
-         grid-template-columns: 1fr;
-     }
+  .form-cliente,
+  .form-categoria,
+  .form-produto,
+  .form-orcamento,
+  .form-item-orcamento {
+    grid-template-columns: 1fr;
+  }
 
-     .campo.nome,
-     .acoes {
-         grid-column: span 1;
-     }
+  .campo.nome,
+  .acoes {
+    grid-column: span 1;
+  }
 
-     table {
-         display: block;
-         overflow-x: auto;
-     }
+  table {
+    display: block;
+    overflow-x: auto;
+  }
 }

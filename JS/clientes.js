@@ -7,10 +7,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_2tOQkWcuI6Xd06OEEG9D1w_Esm6_e9j";
   A variável "supabase" vem da biblioteca que carregamos no HTML:
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 */
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /*
   ============================================
@@ -86,17 +83,50 @@ function formatarCPF(valor) {
   const numeros = valor.replace(/\D/g, "").slice(0, 11);
   if (numeros.length <= 3) return numeros;
   if (numeros.length <= 6) return numeros.slice(0, 3) + "." + numeros.slice(3);
-  if (numeros.length <= 9) return numeros.slice(0, 3) + "." + numeros.slice(3, 6) + "." + numeros.slice(6);
-  return numeros.slice(0, 3) + "." + numeros.slice(3, 6) + "." + numeros.slice(6, 9) + "-" + numeros.slice(9);
+  if (numeros.length <= 9)
+    return (
+      numeros.slice(0, 3) + "." + numeros.slice(3, 6) + "." + numeros.slice(6)
+    );
+  return (
+    numeros.slice(0, 3) +
+    "." +
+    numeros.slice(3, 6) +
+    "." +
+    numeros.slice(6, 9) +
+    "-" +
+    numeros.slice(9)
+  );
 }
 
 function formatarCNPJ(valor) {
   const numeros = valor.replace(/\D/g, "").slice(0, 14);
   if (numeros.length <= 2) return numeros;
   if (numeros.length <= 5) return numeros.slice(0, 2) + "." + numeros.slice(2);
-  if (numeros.length <= 8) return numeros.slice(0, 2) + "." + numeros.slice(2, 5) + "." + numeros.slice(5);
-  if (numeros.length <= 12) return numeros.slice(0, 2) + "." + numeros.slice(2, 5) + "." + numeros.slice(5, 8) + "/" + numeros.slice(8);
-  return numeros.slice(0, 2) + "." + numeros.slice(2, 5) + "." + numeros.slice(5, 8) + "/" + numeros.slice(8, 12) + "-" + numeros.slice(12);
+  if (numeros.length <= 8)
+    return (
+      numeros.slice(0, 2) + "." + numeros.slice(2, 5) + "." + numeros.slice(5)
+    );
+  if (numeros.length <= 12)
+    return (
+      numeros.slice(0, 2) +
+      "." +
+      numeros.slice(2, 5) +
+      "." +
+      numeros.slice(5, 8) +
+      "/" +
+      numeros.slice(8)
+    );
+  return (
+    numeros.slice(0, 2) +
+    "." +
+    numeros.slice(2, 5) +
+    "." +
+    numeros.slice(5, 8) +
+    "/" +
+    numeros.slice(8, 12) +
+    "-" +
+    numeros.slice(12)
+  );
 }
 
 function aplicarMascaraCpfCnpj() {
@@ -225,12 +255,16 @@ function cnpjEhValido(cnpj) {
 function validarDigitosCpfCnpj(tipoCliente, cpfCnpj) {
   const digitos = cpfCnpj.replace(/\D/g, "");
   if (tipoCliente === "F") {
-    if (digitos.length !== 11) return "CPF inválido. O CPF deve ter 11 dígitos.";
-    if (!cpfEhValido(cpfCnpj)) return "CPF inválido. Os dígitos verificadores não conferem.";
+    if (digitos.length !== 11)
+      return "CPF inválido. O CPF deve ter 11 dígitos.";
+    if (!cpfEhValido(cpfCnpj))
+      return "CPF inválido. Os dígitos verificadores não conferem.";
   }
   if (tipoCliente === "J") {
-    if (digitos.length !== 14) return "CNPJ inválido. O CNPJ deve ter 14 dígitos.";
-    if (!cnpjEhValido(cpfCnpj)) return "CNPJ inválido. Os dígitos verificadores não conferem.";
+    if (digitos.length !== 14)
+      return "CNPJ inválido. O CNPJ deve ter 14 dígitos.";
+    if (!cnpjEhValido(cpfCnpj))
+      return "CNPJ inválido. Os dígitos verificadores não conferem.";
   }
   return null;
 }
@@ -335,7 +369,7 @@ async function carregarClientes() {
 
     Para cada cliente, criamos uma linha <tr>.
   */
-  data.forEach(function(cliente) {
+  data.forEach(function (cliente) {
     const linha = document.createElement("tr");
 
     /*
@@ -369,7 +403,7 @@ async function carregarClientes() {
       chamamos a função prepararEdicao
       passando o cliente da linha atual.
     */
-    botaoEditar.addEventListener("click", function() {
+    botaoEditar.addEventListener("click", function () {
       prepararEdicao(cliente);
     });
 
@@ -390,7 +424,7 @@ async function carregarClientes() {
       chamamos a função excluirCliente
       passando o cliente da linha atual.
     */
-    botaoExcluir.addEventListener("click", function() {
+    botaoExcluir.addEventListener("click", function () {
       excluirCliente(cliente);
     });
 
@@ -538,7 +572,10 @@ async function salvarCliente() {
   try {
     proximoClienteId = await buscarProximoClienteIdDisponivel();
   } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
+    mostrarMensagem(
+      "Erro ao calcular o próximo código: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -551,15 +588,13 @@ async function salvarCliente() {
     clienteid: proximoClienteId,
     tipo_cliente: tipoCliente,
     cpf_cnpj_cliente: cpfCnpjCliente,
-    nome_cliente: nomeCliente
+    nome_cliente: nomeCliente,
   };
 
   /*
     Insere o novo cliente na tabela cliente.
   */
-  const { error } = await supabaseClient
-    .from("cliente")
-    .insert(novoCliente);
+  const { error } = await supabaseClient.from("cliente").insert(novoCliente);
 
   /*
     Se houver erro, mostramos a mensagem e paramos a função.
@@ -609,7 +644,10 @@ async function atualizarNomeCliente() {
 
   let cpfCnpjDuplicado;
   try {
-    cpfCnpjDuplicado = await verificarCpfCnpjDuplicado(cpfCnpjCliente, clienteId);
+    cpfCnpjDuplicado = await verificarCpfCnpjDuplicado(
+      cpfCnpjCliente,
+      clienteId,
+    );
   } catch (error) {
     mostrarMensagem("Erro ao verificar CPF/CNPJ: " + error.message, "erro");
     return;
@@ -625,7 +663,7 @@ async function atualizarNomeCliente() {
     .update({
       tipo_cliente: tipoCliente,
       cpf_cnpj_cliente: cpfCnpjCliente,
-      nome_cliente: nomeCliente
+      nome_cliente: nomeCliente,
     })
     .eq("clienteid", clienteId);
 
@@ -660,7 +698,7 @@ async function excluirCliente(cliente) {
     - false se o usuário clicar em Cancelar.
   */
   const confirmou = confirm(
-    "Tem certeza que deseja excluir o cliente " + cliente.nome_cliente + "?"
+    "Tem certeza que deseja excluir o cliente " + cliente.nome_cliente + "?",
   );
 
   /*
@@ -716,7 +754,7 @@ async function excluirCliente(cliente) {
   Este evento acontece quando o usuário clica em Salvar ou Atualizar.
 */
 
-formCliente.addEventListener("submit", async function(evento) {
+formCliente.addEventListener("submit", async function (evento) {
   /*
     Impede a página de recarregar ao enviar o formulário.
   */
@@ -749,7 +787,7 @@ formCliente.addEventListener("submit", async function(evento) {
   chamamos a função cancelarEdicao.
 */
 
-btnCancelarEdicao.addEventListener("click", function() {
+btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 
@@ -762,7 +800,7 @@ btnCancelarEdicao.addEventListener("click", function() {
   Quando o usuário digita, aplica a máscara em tempo real.
 */
 
-tipoClienteInput.addEventListener("change", function() {
+tipoClienteInput.addEventListener("change", function () {
   cpfCnpjClienteInput.value = "";
   atualizarPlaceholderCpfCnpj();
 });

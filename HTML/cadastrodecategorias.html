@@ -1,85 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cadastro de categorias</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="icon" href="../img/favicon.ico" sizes="any">
-</head>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="icon" href="../img/favicon.ico" sizes="any" />
+  </head>
 
-<body>
+  <body>
     <nav class="navbar">
-        <ul>
-            <li><a href="home.html">Ínicio</a></li>
-            <li><a href="cadastrodeclientes.html">Clientes</a></li>
-            <li><a class="ativo" href="cadastrodecategorias.html">Categorias</a></li>
-            <li><a href="cadastrodeprodutos.html">Produtos</a></li>
-            <li><a href="orcamento.html">Orçamento</a></li>
-            <li><a href="telalogin.html">Sair</a></li>
-        </ul>
+      <ul>
+        <li><a href="home.html">Ínicio</a></li>
+        <li><a href="cadastrodeclientes.html">Clientes</a></li>
+        <li>
+          <a class="ativo" href="cadastrodecategorias.html">Categorias</a>
+        </li>
+        <li><a href="cadastrodeprodutos.html">Produtos</a></li>
+        <li><a href="orcamento.html">Orçamento</a></li>
+        <li><a href="telalogin.html">Sair</a></li>
+      </ul>
     </nav>
     <main class="container">
-        <h1>Cadastro de Categorias</h1>
-        <form id="formCategoria" class="form-categoria">
-            <!-- O campo "Código" é gerado automaticamente, por isso é readonly. -->
-            <div class="campo">
-                <label for="CategoriaId">Código da categoria:</label>
-                <input type="text" id="CategoriaId" name="codigo" readonly placeholder="Gerado automaticamente">
-            </div> 
-            
-            <div class="campo">
-                <label for="descCategoria">Descrição:</label>
-                <input type="text" id="descCategoria" name="descricao" required placeholder="Digite a descrição da categoria">
-            </div>
-            
-            <!-- Botões do formulário -->
-            <div class="acoes">
-                <button type="reset" class="btn-limpar">
-                    Limpar
-                </button>
+      <h1>Cadastro de Categorias</h1>
+      <form id="formCategoria" class="form-categoria">
+        <!-- O campo "Código" é gerado automaticamente, por isso é readonly. -->
+        <div class="campo">
+          <label for="CategoriaId">Código da categoria:</label>
+          <input
+            type="text"
+            id="CategoriaId"
+            name="codigo"
+            readonly
+            placeholder="Gerado automaticamente"
+          />
+        </div>
 
-                <button type="button" id="btnCancelarEdicao" class="btn-cancelar-edicao">
-                    Cancelar edição
-                </button>
+        <div class="campo">
+          <label for="descCategoria">Descrição:</label>
+          <input
+            type="text"
+            id="descCategoria"
+            name="descricao"
+            required
+            placeholder="Digite a descrição da categoria"
+          />
+        </div>
 
-                <button type="submit" id="btnSalvar" class="btn-salvar">
-                    Salvar
-                </button>
-            </div>
-        </form>
+        <!-- Botões do formulário -->
+        <div class="acoes">
+          <button type="reset" class="btn-limpar">Limpar</button>
 
-        <!-- Aqui aparecerão mensagens como: "Categoria salva com sucesso" "Erro ao salvar categoria" "Categoria excluída com sucesso" -->
-        <p id="mensagem" class="mensagem"></p>
-        <h2>Categorias Cadastradas</h2>
+          <button
+            type="button"
+            id="btnCancelarEdicao"
+            class="btn-cancelar-edicao"
+          >
+            Cancelar edição
+          </button>
 
-        <!-- Tabela onde as categorias serão exibidos -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Descrição</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+          <button type="submit" id="btnSalvar" class="btn-salvar">
+            Salvar
+          </button>
+        </div>
+      </form>
 
-            <!-- O tbody começa com uma mensagem.
+      <!-- Aqui aparecerão mensagens como: "Categoria salva com sucesso" "Erro ao salvar categoria" "Categoria excluída com sucesso" -->
+      <p id="mensagem" class="mensagem"></p>
+      <h2>Categorias Cadastradas</h2>
+
+      <!-- Tabela onde as categorias serão exibidos -->
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <!-- O tbody começa com uma mensagem.
            Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
-            <tbody id="tabelaCategorias">
-                <tr>
-                    <td colspan="2">Carregando categorias...</td>
-                </tr>
-            </tbody>
-        </table>
-        <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <tbody id="tabelaCategorias">
+          <tr>
+            <td colspan="2">Carregando categorias...</td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <!-- Nosso arquivo JavaScript separado -->
-        <script src="../JS/categorias.js"></script>
+      <!-- Nosso arquivo JavaScript separado -->
+      <script src="../JS/categorias.js"></script>
     </main>
-</body>
-
+  </body>
 </html>
 
 <!-- FALTA O JS COM OS BOTEOES EXLUIR E EDITAR-->

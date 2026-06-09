@@ -1,32 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="icon" href="../img/favicon.ico" sizes="any">
-</head>
-<body class="body-login ">
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="icon" href="../img/favicon.ico" sizes="any" />
+  </head>
+  <body class="body-login">
     <main class="container-login">
-        <div class="box-login">
-            <h1>Login</h1>
-            <div id="mensagem" class="mensagem"></div>
+      <div class="box-login">
+        <h1>Login</h1>
+        <div id="mensagem" class="mensagem"></div>
 
-            <div class="campo">
-                <label for="loginUsuario">Usuário:</label>
-                <input type="text" id="loginUsuario" placeholder="Insira seu nome de usuário">
-            </div>
-            <div class="campo">
-                <label for="senhaUsuario">Senha:</label>
-                <input type="password" id="senhaUsuario" placeholder="Insira sua senha">
-            </div>
-
-            <button id="btnEntrar" class="btn-salvar" disabled>Entrar</button>
+        <div class="campo">
+          <label for="loginUsuario">Usuário:</label>
+          <input
+            type="text"
+            id="loginUsuario"
+            placeholder="Insira seu nome de usuário"
+          />
         </div>
+        <div class="campo">
+          <label for="senhaUsuario">Senha:</label>
+          <input
+            type="password"
+            id="senhaUsuario"
+            placeholder="Insira sua senha"
+          />
+        </div>
+
+        <button id="btnEntrar" class="btn-salvar" disabled>Entrar</button>
+      </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../JS/login.js"></script>
-</body>
+  </body>
 </html>
