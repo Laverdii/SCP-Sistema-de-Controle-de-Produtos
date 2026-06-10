@@ -129,6 +129,7 @@
               id="filtroDescProduto"
               placeholder="Buscar por descrição..."
             />
+            <span class="aviso-min-chars" id="avisoDescProduto">Digite ao menos 4 caracteres para buscar por descrição.</span>
           </div>
           <div class="filtro-campo">
             <label>Observação</label>
@@ -137,6 +138,7 @@
               id="filtroObsProduto"
               placeholder="Buscar por observação..."
             />
+            <span class="aviso-min-chars" id="avisoObsProduto">Digite ao menos 4 caracteres para buscar por observação.</span>
           </div>
         </div>
         <div class="filtros-rodape">
@@ -152,6 +154,9 @@
             </div>
           </div>
           <div class="filtros-acoes">
+            <button type="button" id="btnPesquisarFiltros" class="btn-pesquisar-filtros">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Pesquisar
+            </button>
             <button type="button" id="btnLimparFiltros" class="btn-limpar-filtros">
               Limpar filtros
             </button>

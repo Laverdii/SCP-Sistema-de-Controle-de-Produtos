@@ -22,6 +22,8 @@ const formCliente = document.getElementById("formCliente");
 const tabelaClientes = document.getElementById("tabelaClientes");
 const mensagem = document.getElementById("mensagem");
 const pesquisaClienteInput = document.getElementById("pesquisaCliente");
+const btnPesquisarCliente = document.getElementById("btnPesquisarCliente");
+const avisoCliente = document.getElementById("avisoCliente");
 
 let clientesCarregados = [];
 
@@ -362,11 +364,20 @@ function renderizarClientes(clientes) {
   });
 }
 
-function filtrarClientes() {
-  const termo = pesquisaClienteInput.value.toLowerCase().trim();
+function executarPesquisaClientes() {
+  const valor = pesquisaClienteInput.value.trim();
+  const termo = valor.toLowerCase();
+  const ePuramenteNumerico = /^\d+$/.test(valor);
 
-  if (!termo) {
+  avisoCliente.classList.remove("visivel");
+
+  if (!valor) {
     renderizarClientes(clientesCarregados);
+    return;
+  }
+
+  if (!ePuramenteNumerico && valor.length < 4) {
+    avisoCliente.classList.add("visivel");
     return;
   }
 
@@ -378,6 +389,10 @@ function filtrarClientes() {
   });
 
   renderizarClientes(filtrados);
+}
+
+function filtrarClientes() {
+  executarPesquisaClientes();
 }
 
 async function carregarClientes() {
@@ -796,7 +811,18 @@ tipoClienteInput.addEventListener("change", function () {
 
 cpfCnpjClienteInput.addEventListener("input", aplicarMascaraCpfCnpj);
 
-pesquisaClienteInput.addEventListener("input", filtrarClientes);
+btnPesquisarCliente.addEventListener("click", executarPesquisaClientes);
+
+pesquisaClienteInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") executarPesquisaClientes();
+});
+
+pesquisaClienteInput.addEventListener("input", function () {
+  if (pesquisaClienteInput.value.trim() === "") {
+    avisoCliente.classList.remove("visivel");
+    renderizarClientes(clientesCarregados);
+  }
+});
 
 /*
   ============================================

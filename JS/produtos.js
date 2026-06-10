@@ -38,8 +38,11 @@ const filtroCodCategoriaInput = document.getElementById("filtroCodCategoria");
 const filtroDescProdutoInput = document.getElementById("filtroDescProduto");
 const filtroObsProdutoInput = document.getElementById("filtroObsProduto");
 const btnLimparFiltros = document.getElementById("btnLimparFiltros");
+const btnPesquisarFiltros = document.getElementById("btnPesquisarFiltros");
 const contadorResultados = document.getElementById("contadorResultados");
 const pillsStatus = document.querySelectorAll(".pill[data-status]");
+const avisoDescProduto = document.getElementById("avisoDescProduto");
+const avisoObsProduto = document.getElementById("avisoObsProduto");
 
 let produtosCarregados = [];
 const statusSelecionados = new Set();
@@ -192,7 +195,31 @@ function renderizarProdutos(produtos) {
   });
 }
 
+function validarCamposTexto() {
+  const descValor = filtroDescProdutoInput.value.trim();
+  const obsValor = filtroObsProdutoInput.value.trim();
+  let valido = true;
+
+  if (descValor.length > 0 && descValor.length < 4) {
+    avisoDescProduto.classList.add("visivel");
+    valido = false;
+  } else {
+    avisoDescProduto.classList.remove("visivel");
+  }
+
+  if (obsValor.length > 0 && obsValor.length < 4) {
+    avisoObsProduto.classList.add("visivel");
+    valido = false;
+  } else {
+    avisoObsProduto.classList.remove("visivel");
+  }
+
+  return valido;
+}
+
 function filtrarProdutos() {
+  if (!validarCamposTexto()) return;
+
   const codProduto = filtroCodProdutoInput.value.trim();
   const codCategoria = filtroCodCategoriaInput.value.trim();
   const desc = filtroDescProdutoInput.value.toLowerCase().trim();
@@ -582,13 +609,23 @@ pillsStatus.forEach(function (pill) {
   });
 });
 
+btnPesquisarFiltros.addEventListener("click", filtrarProdutos);
+
 [
   filtroCodProdutoInput,
   filtroCodCategoriaInput,
   filtroDescProdutoInput,
   filtroObsProdutoInput,
 ].forEach(function (input) {
-  input.addEventListener("input", filtrarProdutos);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") filtrarProdutos();
+  });
+  input.addEventListener("input", function () {
+    const descValor = filtroDescProdutoInput.value.trim();
+    const obsValor = filtroObsProdutoInput.value.trim();
+    if (descValor === "" || descValor.length >= 4) avisoDescProduto.classList.remove("visivel");
+    if (obsValor === "" || obsValor.length >= 4) avisoObsProduto.classList.remove("visivel");
+  });
 });
 
 btnLimparFiltros.addEventListener("click", function () {
@@ -597,6 +634,8 @@ btnLimparFiltros.addEventListener("click", function () {
   filtroDescProdutoInput.value = "";
   filtroObsProdutoInput.value = "";
   statusSelecionados.clear();
+  avisoDescProduto.classList.remove("visivel");
+  avisoObsProduto.classList.remove("visivel");
   pillsStatus.forEach(function (pill) {
     pill.classList.remove("ativa");
   });

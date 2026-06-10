@@ -69,11 +69,17 @@
       <p id="mensagem" class="mensagem"></p>
       <h2>Categorias Cadastradas</h2>
       <div class="barra-pesquisa">
-        <input
-          type="text"
-          id="pesquisaCategoria"
-          placeholder="Pesquisar por código ou descrição..."
-        />
+        <div class="barra-pesquisa-wrapper">
+          <input
+            type="text"
+            id="pesquisaCategoria"
+            placeholder="Pesquisar por código ou descrição..."
+          />
+          <button type="button" class="btn-pesquisar-inline" id="btnPesquisarCategoria" title="Pesquisar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
+        <span class="aviso-min-chars" id="avisoCategoria">Digite ao menos 4 caracteres para buscar por descrição.</span>
       </div>
 
       <!-- Tabela onde as categorias serão exibidos -->

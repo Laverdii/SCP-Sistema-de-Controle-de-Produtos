@@ -7,6 +7,8 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const mensagemPrincipal = document.getElementById("mensagemPrincipal");
 const tabelaListaOrcamentos = document.getElementById("tabelaListaOrcamentos");
 const pesquisaOrcamentosInput = document.getElementById("pesquisaOrcamentos");
+const btnPesquisarOrcamentos = document.getElementById("btnPesquisarOrcamentos");
+const avisoOrcamentos = document.getElementById("avisoOrcamentos");
 const btnNovoOrcamento = document.getElementById("btnNovoOrcamento");
 
 // ─── Modal: Atribuir / Editar ─────────────────────────────────────
@@ -21,7 +23,6 @@ const orcamentoIdInput = document.getElementById("OrcamentoId");
 const clienteOrcamentoInput = document.getElementById("OrcamentoCliente");
 const dataOrcamentoInput = document.getElementById("dt_orcamento");
 const validadeOrcamentoInput = document.getElementById("dt_validade_orcamento");
-const valorTotalOrcamentoInput = document.getElementById("vl_total_orcamento");
 const btnSalvar = document.getElementById("btnSalvar");
 
 // ─── Seção de itens (modo edição) ────────────────────────────────
@@ -34,6 +35,8 @@ const btnCancelarItem = document.getElementById("btnCancelarItem");
 const btnSalvarItem = document.getElementById("btnSalvarItem");
 const tabelaItensEdicao = document.getElementById("tabelaItensEdicao");
 const pesquisaItemOrcamentoInput = document.getElementById("pesquisaItemOrcamento");
+const btnPesquisarItemOrcamento = document.getElementById("btnPesquisarItemOrcamento");
+const avisoItemOrcamento = document.getElementById("avisoItemOrcamento");
 
 // ─── Modal: Ver Itens ─────────────────────────────────────────────
 const modalVerItens = document.getElementById("modalVerItens");
@@ -181,11 +184,20 @@ function renderizarListaOrcamentos(lista) {
   });
 }
 
-function filtrarListaOrcamentos() {
-  const termo = pesquisaOrcamentosInput.value.toLowerCase().trim();
+function executarPesquisaOrcamentos() {
+  const valor = pesquisaOrcamentosInput.value.trim();
+  const termo = valor.toLowerCase();
+  const ePuramenteNumerico = /^\d+$/.test(valor);
 
-  if (!termo) {
+  avisoOrcamentos.classList.remove("visivel");
+
+  if (!valor) {
     renderizarListaOrcamentos(listaOrcamentosCarregados);
+    return;
+  }
+
+  if (!ePuramenteNumerico && valor.length < 4) {
+    avisoOrcamentos.classList.add("visivel");
     return;
   }
 
@@ -202,13 +214,16 @@ function filtrarListaOrcamentos() {
   renderizarListaOrcamentos(filtrados);
 }
 
+function filtrarListaOrcamentos() {
+  executarPesquisaOrcamentos();
+}
+
 // ─── Modal: Atribuir (criar) ──────────────────────────────────────
 
 function abrirModalAtribuir() {
   modoEdicaoOrcamento = null;
   orcamentoIdInput.value = "";
   clienteOrcamentoInput.value = "";
-  valorTotalOrcamentoInput.value = "";
   preencherDatasAutomaticas();
   mensagem.textContent = "";
   mensagem.className = "mensagem";
@@ -232,7 +247,6 @@ function abrirModalParaEditar(orcamento) {
   validadeOrcamentoInput.value = orcamento.dt_validade_orcamento
     ? orcamento.dt_validade_orcamento.slice(0, 10)
     : "";
-  valorTotalOrcamentoInput.value = formatarMoeda(orcamento.vl_total_orcamento || 0);
   mensagem.textContent = "";
   mensagem.className = "mensagem";
   modalAtribuirTitulo.textContent = "Editar Orçamento";
@@ -336,11 +350,20 @@ function renderizarItensOrcamento(itens) {
   });
 }
 
-function filtrarItensOrcamento() {
-  const termo = pesquisaItemOrcamentoInput.value.toLowerCase().trim();
+function executarPesquisaItensOrcamento() {
+  const valor = pesquisaItemOrcamentoInput.value.trim();
+  const termo = valor.toLowerCase();
+  const ePuramenteNumerico = /^\d+$/.test(valor);
 
-  if (!termo) {
+  avisoItemOrcamento.classList.remove("visivel");
+
+  if (!valor) {
     renderizarItensOrcamento(itensOrcamentoCarregados);
+    return;
+  }
+
+  if (!ePuramenteNumerico && valor.length < 4) {
+    avisoItemOrcamento.classList.add("visivel");
     return;
   }
 
@@ -352,6 +375,10 @@ function filtrarItensOrcamento() {
   });
 
   renderizarItensOrcamento(filtrados);
+}
+
+function filtrarItensOrcamento() {
+  executarPesquisaItensOrcamento();
 }
 
 function prepararEdicaoItem(item) {
@@ -370,8 +397,6 @@ function limparFormularioItem() {
 }
 
 async function atualizarTotalOrcamento(total) {
-  valorTotalOrcamentoInput.value = formatarMoeda(total);
-
   if (!modoEdicaoOrcamento) return;
 
   const { error } = await supabaseClient
@@ -759,8 +784,31 @@ btnFecharModalAtribuir.addEventListener("click", fecharModalAtribuir);
 btnFecharModalVerItens.addEventListener("click", fecharModalVerItens);
 formItemOrcamento.addEventListener("submit", salvarItemOrcamento);
 btnCancelarItem.addEventListener("click", limparFormularioItem);
-pesquisaOrcamentosInput.addEventListener("input", filtrarListaOrcamentos);
-pesquisaItemOrcamentoInput.addEventListener("input", filtrarItensOrcamento);
+btnPesquisarOrcamentos.addEventListener("click", executarPesquisaOrcamentos);
+
+pesquisaOrcamentosInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") executarPesquisaOrcamentos();
+});
+
+pesquisaOrcamentosInput.addEventListener("input", function () {
+  if (pesquisaOrcamentosInput.value.trim() === "") {
+    avisoOrcamentos.classList.remove("visivel");
+    renderizarListaOrcamentos(listaOrcamentosCarregados);
+  }
+});
+
+btnPesquisarItemOrcamento.addEventListener("click", executarPesquisaItensOrcamento);
+
+pesquisaItemOrcamentoInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") executarPesquisaItensOrcamento();
+});
+
+pesquisaItemOrcamentoInput.addEventListener("input", function () {
+  if (pesquisaItemOrcamentoInput.value.trim() === "") {
+    avisoItemOrcamento.classList.remove("visivel");
+    renderizarItensOrcamento(itensOrcamentoCarregados);
+  }
+});
 formOrcamento.addEventListener("submit", salvarOrcamento);
 
 clienteOrcamentoInput.addEventListener("change", function () {

@@ -31,11 +31,17 @@
       <p id="mensagemPrincipal" class="mensagem"></p>
 
       <div class="barra-pesquisa">
-        <input
-          type="text"
-          id="pesquisaOrcamentos"
-          placeholder="Pesquisar por ID ou cliente..."
-        />
+        <div class="barra-pesquisa-wrapper">
+          <input
+            type="text"
+            id="pesquisaOrcamentos"
+            placeholder="Pesquisar por ID ou cliente..."
+          />
+          <button type="button" class="btn-pesquisar-inline" id="btnPesquisarOrcamentos" title="Pesquisar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
+        <span class="aviso-min-chars" id="avisoOrcamentos">Digite ao menos 4 caracteres para buscar por nome do cliente.</span>
       </div>
 
       <div class="table-wrapper">
@@ -113,17 +119,6 @@
               />
             </div>
 
-            <div class="campo">
-              <label for="vl_total_orcamento">Valor total do orçamento:</label>
-              <input
-                type="text"
-                id="vl_total_orcamento"
-                name="vl_total_orcamento"
-                readonly
-                placeholder="Calculado automaticamente"
-              />
-            </div>
-
             <div class="acoes">
               <button type="button" id="btnCancelarModal" class="btn-limpar">
                 Cancelar
@@ -176,11 +171,17 @@
             </form>
 
             <div class="barra-pesquisa">
-              <input
-                type="text"
-                id="pesquisaItemOrcamento"
-                placeholder="Pesquisar por ID ou descrição do produto..."
-              />
+              <div class="barra-pesquisa-wrapper">
+                <input
+                  type="text"
+                  id="pesquisaItemOrcamento"
+                  placeholder="Pesquisar por ID ou descrição do produto..."
+                />
+                <button type="button" class="btn-pesquisar-inline" id="btnPesquisarItemOrcamento" title="Pesquisar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+              </div>
+              <span class="aviso-min-chars" id="avisoItemOrcamento">Digite ao menos 4 caracteres para buscar por descrição do produto.</span>
             </div>
 
             <div class="table-wrapper">

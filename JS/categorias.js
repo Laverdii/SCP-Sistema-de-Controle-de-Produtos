@@ -22,6 +22,8 @@ const formCategoria = document.getElementById("formCategoria");
 const tabelaCategorias = document.getElementById("tabelaCategorias");
 const mensagem = document.getElementById("mensagem");
 const pesquisaCategoriaInput = document.getElementById("pesquisaCategoria");
+const btnPesquisarCategoria = document.getElementById("btnPesquisarCategoria");
+const avisoCategoria = document.getElementById("avisoCategoria");
 
 const CategoriaIdInput = document.getElementById("CategoriaId");
 const descCategoriaInput = document.getElementById("descCategoria");
@@ -138,11 +140,20 @@ function renderizarCategorias(categorias) {
   });
 }
 
-function filtrarCategorias() {
-  const termo = pesquisaCategoriaInput.value.toLowerCase().trim();
+function executarPesquisaCategorias() {
+  const valor = pesquisaCategoriaInput.value.trim();
+  const termo = valor.toLowerCase();
+  const ePuramenteNumerico = /^\d+$/.test(valor);
 
-  if (!termo) {
+  avisoCategoria.classList.remove("visivel");
+
+  if (!valor) {
     renderizarCategorias(categoriasCarregadas);
+    return;
+  }
+
+  if (!ePuramenteNumerico && valor.length < 4) {
+    avisoCategoria.classList.add("visivel");
     return;
   }
 
@@ -154,6 +165,10 @@ function filtrarCategorias() {
   });
 
   renderizarCategorias(filtradas);
+}
+
+function filtrarCategorias() {
+  executarPesquisaCategorias();
 }
 
 async function carregarCategorias() {
@@ -581,6 +596,17 @@ btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 
-pesquisaCategoriaInput.addEventListener("input", filtrarCategorias);
+btnPesquisarCategoria.addEventListener("click", executarPesquisaCategorias);
+
+pesquisaCategoriaInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") executarPesquisaCategorias();
+});
+
+pesquisaCategoriaInput.addEventListener("input", function () {
+  if (pesquisaCategoriaInput.value.trim() === "") {
+    avisoCategoria.classList.remove("visivel");
+    renderizarCategorias(categoriasCarregadas);
+  }
+});
 
 carregarCategorias();
