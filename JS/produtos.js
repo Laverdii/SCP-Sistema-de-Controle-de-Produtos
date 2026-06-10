@@ -22,7 +22,7 @@ const formProduto = document.getElementById("formProduto");
 const tabelaProdutos = document.getElementById("tabelaProdutos");
 const mensagem = document.getElementById("mensagem");
 
-const ProdutoIdInput = document.getElementById("produtoId");
+const produtoIdInput = document.getElementById("produtoId");
 const categoriaProdutoInput = document.getElementById("categoriaProduto");
 const descProdutoInput = document.getElementById("descProduto");
 const obsProdutoInput = document.getElementById("obsProduto");
@@ -32,6 +32,17 @@ const statusProdutoInput = document.getElementById("statusProduto");
 
 const btnSalvar = document.getElementById("btnSalvar");
 const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
+
+const filtroCodProdutoInput = document.getElementById("filtroCodProduto");
+const filtroCodCategoriaInput = document.getElementById("filtroCodCategoria");
+const filtroDescProdutoInput = document.getElementById("filtroDescProduto");
+const filtroObsProdutoInput = document.getElementById("filtroObsProduto");
+const btnLimparFiltros = document.getElementById("btnLimparFiltros");
+const contadorResultados = document.getElementById("contadorResultados");
+const pillsStatus = document.querySelectorAll(".pill[data-status]");
+
+let produtosCarregados = [];
+const statusSelecionados = new Set();
 
 /*
   ============================================
@@ -133,6 +144,87 @@ async function carregarCategoriasDoSelect() {
   });
 }
 
+function renderizarProdutos(produtos) {
+  if (produtos.length === 0) {
+    tabelaProdutos.innerHTML = `
+      <tr>
+        <td colspan="8">Nenhum produto encontrado.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tabelaProdutos.innerHTML = "";
+
+  produtos.forEach(function (Produto) {
+    const linha = document.createElement("tr");
+
+    linha.innerHTML = `
+      <td>${Produto.produtoid}</td>
+      <td>${Produto.categoriaprodutoid}</td>
+      <td>${Produto.ds_produto}</td>
+      <td>${Produto.obs_produto}</td>
+      <td>${Produto.vl_venda_produto}</td>
+      <td>${Produto.dt_cadastro_produto ? Produto.dt_cadastro_produto.substring(0, 10) : ""}</td>
+      <td>${Produto.status_produto}</td>
+      <td class="coluna-acoes"></td>
+    `;
+
+    const botaoEditar = document.createElement("button");
+    botaoEditar.textContent = "Editar";
+    botaoEditar.className = "btn-editar";
+    botaoEditar.type = "button";
+    botaoEditar.addEventListener("click", function () {
+      prepararEdicao(Produto);
+    });
+
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.textContent = "Excluir";
+    botaoExcluir.className = "btn-excluir";
+    botaoExcluir.type = "button";
+    botaoExcluir.addEventListener("click", function () {
+      excluirProduto(Produto);
+    });
+
+    linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
+    linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
+    tabelaProdutos.appendChild(linha);
+  });
+}
+
+function filtrarProdutos() {
+  const codProduto = filtroCodProdutoInput.value.trim();
+  const codCategoria = filtroCodCategoriaInput.value.trim();
+  const desc = filtroDescProdutoInput.value.toLowerCase().trim();
+  const obs = filtroObsProdutoInput.value.toLowerCase().trim();
+
+  const filtrados = produtosCarregados.filter(function (produto) {
+    if (codProduto && !String(produto.produtoid).includes(codProduto))
+      return false;
+    if (
+      codCategoria &&
+      !String(produto.categoriaprodutoid).includes(codCategoria)
+    )
+      return false;
+    if (desc && !produto.ds_produto.toLowerCase().includes(desc)) return false;
+    if (obs && !produto.obs_produto.toLowerCase().includes(obs)) return false;
+    if (
+      statusSelecionados.size > 0 &&
+      !statusSelecionados.has(produto.status_produto)
+    )
+      return false;
+    return true;
+  });
+
+  renderizarProdutos(filtrados);
+
+  const total = produtosCarregados.length;
+  contadorResultados.textContent =
+    filtrados.length === total
+      ? `${total} produto${total !== 1 ? "s" : ""}`
+      : `${filtrados.length} de ${total} produto${total !== 1 ? "s" : ""}`;
+}
+
 async function carregarProdutos() {
   const { data, error } = await supabaseClient
     .from("produto")
@@ -141,118 +233,29 @@ async function carregarProdutos() {
     )
     .order("produtoid", { ascending: true });
 
-  /*
-    Se der erro na consulta, mostramos uma mensagem na tabela
-    e também uma mensagem de erro acima da listagem.
-  */
   if (error) {
     tabelaProdutos.innerHTML = `
       <tr>
         <td colspan="8">Erro ao carregar Produtos.</td>
       </tr>
     `;
-
     mostrarMensagem("Erro ao buscar produtos: " + error.message, "erro");
     return;
   }
 
-  /*
-    Se a consulta funcionar, mas não houver nenhum Produto,
-    mostramos uma mensagem dizendo que não há registros.
-  */
   if (data.length === 0) {
+    produtosCarregados = [];
     tabelaProdutos.innerHTML = `
       <tr>
         <td colspan="8">Nenhum Produto cadastrado.</td>
       </tr>
     `;
+    contadorResultados.textContent = "0 produtos";
     return;
   }
 
-  /*
-    Limpamos o corpo da tabela antes de preencher.
-    Isso evita duplicar linhas quando recarregamos os Produtos.
-  */
-  tabelaProdutos.innerHTML = "";
-
-  /*
-    Percorremos a lista de Produtos retornada pelo Supabase.
-
-    Para cada Produto, criamos uma linha <tr>.
-  */
-  data.forEach(function (Produto) {
-    const linha = document.createElement("tr");
-
-    /*
-      Criamos as colunas principais da linha.
-
-      A última coluna recebe a classe "coluna-acoes".
-      Nessa coluna colocaremos os botões Editar e Excluir.
-    */
-    linha.innerHTML = `
-      <td>${Produto.produtoid}</td>
-      <td>${Produto.categoriaprodutoid}</td>
-      <td>${Produto.ds_produto}</td>
-      <td>${Produto.obs_produto}</td>
-      <td>${Produto.vl_venda_produto}</td>
-      <td>${Produto.dt_cadastro_produto}</td>
-      <td>${Produto.status_produto}</td>
-      <td class="coluna-acoes"></td>
-    `;
-
-    /*
-      ============================================
-      BOTÃO EDITAR
-      ============================================
-    */
-
-    const botaoEditar = document.createElement("button");
-
-    botaoEditar.textContent = "Editar";
-    botaoEditar.className = "btn-editar";
-    botaoEditar.type = "button";
-
-    /*
-      Quando clicar no botão Editar,
-      chamamos a função prepararEdicao
-      passando o Produto da linha atual.
-    */
-    botaoEditar.addEventListener("click", function () {
-      prepararEdicao(Produto);
-    });
-
-    /*
-      ============================================
-      BOTÃO EXCLUIR
-      ============================================
-    */
-
-    const botaoExcluir = document.createElement("button");
-
-    botaoExcluir.textContent = "Excluir";
-    botaoExcluir.className = "btn-excluir";
-    botaoExcluir.type = "button";
-
-    /*
-      Quando clicar no botão Excluir,
-      chamamos a função excluirProduto
-      passando o Produto da linha atual.
-    */
-    botaoExcluir.addEventListener("click", function () {
-      excluirProduto(Produto);
-    });
-
-    /*
-      Adicionamos os botões dentro da coluna Ações.
-    */
-    linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
-    linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
-
-    /*
-      Adicionamos a linha pronta dentro do tbody da tabela.
-    */
-    tabelaProdutos.appendChild(linha);
-  });
+  produtosCarregados = data;
+  filtrarProdutos();
 }
 
 /*
@@ -270,19 +273,19 @@ function prepararEdicao(Produto) {
     Preenche o campo código.
     Esse campo é importante porque usaremos o ID para saber qual Produto atualizar.
   */
-  ProdutoIdInput.value = Produto.produtoid;
+  produtoIdInput.value = Produto.produtoid;
 
   /*
     Preenche os demais campos com os dados do Produto.
   */
+  categoriaProdutoInput.value = Produto.categoriaprodutoid;
   descProdutoInput.value = Produto.ds_produto;
   obsProdutoInput.value = Produto.obs_produto;
+  valorProdutoInput.value = Produto.vl_venda_produto;
   dataCadastroInput.value = Produto.dt_cadastro_produto
     ? Produto.dt_cadastro_produto.substring(0, 10)
     : "";
   statusProdutoInput.value = Produto.status_produto;
-  valorProdutoInput.value = Produto.vl_venda_produto;
-  categoriaProdutoInput.value = Produto.categoriaprodutoid;
 
   /*
     Mudamos o texto do botão principal para "Atualizar".
@@ -298,11 +301,7 @@ function prepararEdicao(Produto) {
     Mostramos uma mensagem informando que o usuário está editando.
   */
   mostrarMensagem(
-    "Editando o Produto: " +
-      Produto.obs_produto +
-      " - " +
-      Produto.ds_produto +
-      "sucesso",
+    "Editando o Produto: " + Produto.obs_produto + " - " + Produto.ds_produto,
   );
 }
 
@@ -315,16 +314,10 @@ function prepararEdicao(Produto) {
 */
 
 function cancelarEdicao() {
-  /*
-    Limpa os campos do formulário.
-  */
   formProduto.reset();
+  preencherDatasAutomaticas();
 
-  /*
-    Garante que o ID fique vazio.
-    Se o ID estiver vazio, o sistema entende que é um novo cadastro.
-  */
-  ProdutoIdInput.value = "";
+  produtoIdInput.value = "";
 
   /*
     Volta o botão principal para "Salvar".
@@ -410,14 +403,9 @@ async function salvarProduto() {
   */
   mostrarMensagem("Produto salvo com sucesso!", "sucesso");
 
-  /*
-    Limpamos o formulário.
-  */
   formProduto.reset();
+  preencherDatasAutomaticas();
 
-  /*
-    Recarregamos a listagem para mostrar o novo Produto na tabela.
-  */
   carregarProdutos();
 }
 
@@ -431,51 +419,34 @@ async function salvarProduto() {
   Ela será chamada quando o campo ProdutoId estiver preenchido.
 */
 
-async function atualizarNomeProduto() {
-  /*
-    Pegamos o ID do Produto que está sendo editado.
-  */
-  const ProdutoId = ProdutoIdInput.value;
+async function atualizarProduto() {
+  const produtoId = produtoIdInput.value;
+  const categoriaProduto = categoriaProdutoInput.value;
+  const descProduto = descProdutoInput.value;
+  const obsProduto = obsProdutoInput.value;
+  const valorProduto = valorProdutoInput.value;
+  const dataCadastro = dataCadastroInput.value;
+  const statusProduto = statusProdutoInput.value;
 
-  /*
-    Pegamos o novo nome digitado.
-  */
-  const ds_Produto = descProdutoInput.value;
-
-  /*
-    Atualizamos somente a coluna ds_produto.
-
-    O filtro .eq("produtoid", ProdutoId) é essencial.
-    Ele informa qual registro será atualizado.
-  */
   const { error } = await supabaseClient
     .from("produto")
     .update({
-      ds_produto: ds_Produto,
+      categoriaprodutoid: categoriaProduto,
+      ds_produto: descProduto,
+      obs_produto: obsProduto,
+      vl_venda_produto: valorProduto,
+      dt_cadastro_produto: dataCadastro,
+      status_produto: statusProduto,
     })
-    .eq("produtoid", ProdutoId);
+    .eq("produtoid", produtoId);
 
-  /*
-    Se houver erro, mostramos a mensagem e paramos.
-  */
   if (error) {
     mostrarMensagem("Erro ao atualizar Produto: " + error.message, "erro");
     return;
   }
 
-  /*
-    Se deu certo, mostramos mensagem de sucesso.
-  */
-  mostrarMensagem("Nome atualizado com sucesso!", "sucesso");
-
-  /*
-    Saímos do modo edição.
-  */
   cancelarEdicao();
-
-  /*
-    Recarregamos a tabela para mostrar o nome atualizado.
-  */
+  mostrarMensagem("Sucesso ao atualizar item: " + descProduto, "sucesso");
   carregarProdutos();
 }
 
@@ -537,7 +508,7 @@ async function excluirProduto(Produto) {
     Se o Produto excluído era o mesmo que estava sendo editado,
     cancelamos a edição para limpar o formulário.
   */
-  if (ProdutoIdInput.value == Produto.produtoid) {
+  if (produtoIdInput.value == Produto.produtoid) {
     cancelarEdicao();
   }
 
@@ -575,16 +546,12 @@ formProduto.addEventListener("submit", async function (evento) {
     Se estiver preenchido:
     - é uma edição.
   */
-  try {
-    const estaEditando = ProdutoIdInput.value !== "";
+  const estaEditando = produtoIdInput.value !== "";
 
-    if (estaEditando) {
-      await atualizarNomeProduto();
-    } else {
-      await salvarProduto();
-    }
-  } catch (erro) {
-    mostrarMensagem("Erro inesperado: " + erro.message, "erro");
+  if (estaEditando) {
+    await atualizarProduto();
+  } else {
+    await salvarProduto();
   }
 });
 
@@ -601,14 +568,40 @@ btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 
-/*
-  ============================================
-  CARREGAMENTO INICIAL DA PÁGINA
-  ============================================
+pillsStatus.forEach(function (pill) {
+  pill.addEventListener("click", function () {
+    const status = pill.dataset.status;
+    if (statusSelecionados.has(status)) {
+      statusSelecionados.delete(status);
+      pill.classList.remove("ativa");
+    } else {
+      statusSelecionados.add(status);
+      pill.classList.add("ativa");
+    }
+    filtrarProdutos();
+  });
+});
 
-  Assim que o arquivo JavaScript é carregado,
-  buscamos os Produtos no Supabase.
-*/
+[
+  filtroCodProdutoInput,
+  filtroCodCategoriaInput,
+  filtroDescProdutoInput,
+  filtroObsProdutoInput,
+].forEach(function (input) {
+  input.addEventListener("input", filtrarProdutos);
+});
+
+btnLimparFiltros.addEventListener("click", function () {
+  filtroCodProdutoInput.value = "";
+  filtroCodCategoriaInput.value = "";
+  filtroDescProdutoInput.value = "";
+  filtroObsProdutoInput.value = "";
+  statusSelecionados.clear();
+  pillsStatus.forEach(function (pill) {
+    pill.classList.remove("ativa");
+  });
+  filtrarProdutos();
+});
 
 preencherDatasAutomaticas();
 carregarCategoriasDoSelect();

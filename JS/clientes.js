@@ -21,6 +21,9 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const formCliente = document.getElementById("formCliente");
 const tabelaClientes = document.getElementById("tabelaClientes");
 const mensagem = document.getElementById("mensagem");
+const pesquisaClienteInput = document.getElementById("pesquisaCliente");
+
+let clientesCarregados = [];
 
 const clienteIdInput = document.getElementById("clienteId");
 const tipoClienteInput = document.getElementById("tipoCliente");
@@ -73,6 +76,202 @@ function formatarTipoCliente(tipoCliente) {
   return "Não informado";
 }
 
+/*
+  ============================================
+  FORMATAÇÃO DE CPF E CNPJ
+  ============================================
+*/
+
+function formatarCPF(valor) {
+  const numeros = valor.replace(/\D/g, "").slice(0, 11);
+  if (numeros.length <= 3) return numeros;
+  if (numeros.length <= 6) return numeros.slice(0, 3) + "." + numeros.slice(3);
+  if (numeros.length <= 9)
+    return (
+      numeros.slice(0, 3) + "." + numeros.slice(3, 6) + "." + numeros.slice(6)
+    );
+  return (
+    numeros.slice(0, 3) +
+    "." +
+    numeros.slice(3, 6) +
+    "." +
+    numeros.slice(6, 9) +
+    "-" +
+    numeros.slice(9)
+  );
+}
+
+function formatarCNPJ(valor) {
+  const numeros = valor.replace(/\D/g, "").slice(0, 14);
+  if (numeros.length <= 2) return numeros;
+  if (numeros.length <= 5) return numeros.slice(0, 2) + "." + numeros.slice(2);
+  if (numeros.length <= 8)
+    return (
+      numeros.slice(0, 2) + "." + numeros.slice(2, 5) + "." + numeros.slice(5)
+    );
+  if (numeros.length <= 12)
+    return (
+      numeros.slice(0, 2) +
+      "." +
+      numeros.slice(2, 5) +
+      "." +
+      numeros.slice(5, 8) +
+      "/" +
+      numeros.slice(8)
+    );
+  return (
+    numeros.slice(0, 2) +
+    "." +
+    numeros.slice(2, 5) +
+    "." +
+    numeros.slice(5, 8) +
+    "/" +
+    numeros.slice(8, 12) +
+    "-" +
+    numeros.slice(12)
+  );
+}
+
+function aplicarMascaraCpfCnpj() {
+  const tipo = tipoClienteInput.value;
+  if (tipo === "F") {
+    cpfCnpjClienteInput.value = formatarCPF(cpfCnpjClienteInput.value);
+  } else if (tipo === "J") {
+    cpfCnpjClienteInput.value = formatarCNPJ(cpfCnpjClienteInput.value);
+  }
+}
+
+function atualizarPlaceholderCpfCnpj() {
+  if (tipoClienteInput.value === "F") {
+    cpfCnpjClienteInput.placeholder = "000.000.000-00";
+  } else if (tipoClienteInput.value === "J") {
+    cpfCnpjClienteInput.placeholder = "00.000.000/0000-00";
+  } else {
+    cpfCnpjClienteInput.placeholder = "Digite o CPF ou CNPJ";
+  }
+}
+
+/*
+  ============================================
+  VERIFICAÇÃO DE CPF/CNPJ DUPLICADO
+  ============================================
+
+  Busca no banco se já existe outro cliente com o mesmo CPF/CNPJ.
+  O parâmetro clienteIdAtual é passado durante edição para excluir
+  o próprio cliente da verificação.
+*/
+
+async function verificarCpfCnpjDuplicado(cpfCnpj, clienteIdAtual) {
+  let query = supabaseClient
+    .from("cliente")
+    .select("clienteid")
+    .eq("cpf_cnpj_cliente", cpfCnpj);
+
+  if (clienteIdAtual) {
+    query = query.neq("clienteid", clienteIdAtual);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return data.length > 0;
+}
+
+/*
+  ============================================
+  ALGORITMO DE VALIDAÇÃO DE CPF
+  ============================================
+
+  O CPF tem 11 dígitos. Os dois últimos são dígitos verificadores
+  calculados a partir dos 9 primeiros. O algoritmo:
+
+  1ª verificação — multiplica os 9 primeiros dígitos pelos pesos
+  10, 9, 8 ... 2, soma os resultados e calcula o resto da divisão
+  por 11. Se o resto for < 2, o dígito verificador é 0; caso
+  contrário é 11 - resto. O resultado deve bater com o 10º dígito.
+
+  2ª verificação — repete o processo com os 10 primeiros dígitos
+  e pesos 11, 10, 9 ... 2. O resultado deve bater com o 11º dígito.
+
+  CPFs com todos os dígitos iguais (ex: 111.111.111-11) passam
+  matematicamente mas são inválidos — rejeitamos antes de calcular.
+*/
+
+function cpfEhValido(cpf) {
+  const n = cpf.replace(/\D/g, "");
+
+  if (/^(\d)\1{10}$/.test(n)) return false;
+
+  let soma = 0;
+  for (let i = 0; i < 9; i++) soma += parseInt(n[i]) * (10 - i);
+  let resto = soma % 11;
+  const digito1 = resto < 2 ? 0 : 11 - resto;
+  if (digito1 !== parseInt(n[9])) return false;
+
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += parseInt(n[i]) * (11 - i);
+  resto = soma % 11;
+  const digito2 = resto < 2 ? 0 : 11 - resto;
+  return digito2 === parseInt(n[10]);
+}
+
+/*
+  ============================================
+  ALGORITMO DE VALIDAÇÃO DE CNPJ
+  ============================================
+
+  O CNPJ tem 14 dígitos. Os dois últimos são dígitos verificadores.
+
+  1ª verificação — multiplica os 12 primeiros dígitos pelos pesos
+  5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2. O cálculo do dígito segue
+  a mesma lógica do CPF (resto < 2 → 0, senão 11 - resto).
+  O resultado deve bater com o 13º dígito.
+
+  2ª verificação — repete com os 13 primeiros e pesos
+  6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2.
+  O resultado deve bater com o 14º dígito.
+*/
+
+function cnpjEhValido(cnpj) {
+  const n = cnpj.replace(/\D/g, "");
+
+  if (/^(\d)\1{13}$/.test(n)) return false;
+
+  const pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  let soma = 0;
+  for (let i = 0; i < 12; i++) soma += parseInt(n[i]) * pesos1[i];
+  let resto = soma % 11;
+  const digito1 = resto < 2 ? 0 : 11 - resto;
+  if (digito1 !== parseInt(n[12])) return false;
+
+  const pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  soma = 0;
+  for (let i = 0; i < 13; i++) soma += parseInt(n[i]) * pesos2[i];
+  resto = soma % 11;
+  const digito2 = resto < 2 ? 0 : 11 - resto;
+  return digito2 === parseInt(n[13]);
+}
+
+function validarDigitosCpfCnpj(tipoCliente, cpfCnpj) {
+  const digitos = cpfCnpj.replace(/\D/g, "");
+  if (tipoCliente === "F") {
+    if (digitos.length !== 11)
+      return "CPF inválido. O CPF deve ter 11 dígitos.";
+    if (!cpfEhValido(cpfCnpj))
+      return "CPF inválido. Os dígitos verificadores não conferem.";
+  }
+  if (tipoCliente === "J") {
+    if (digitos.length !== 14)
+      return "CNPJ inválido. O CNPJ deve ter 14 dígitos.";
+    if (!cnpjEhValido(cpfCnpj))
+      return "CNPJ inválido. Os dígitos verificadores não conferem.";
+  }
+  return null;
+}
+
 async function buscarProximoClienteIdDisponivel() {
   const { data, error } = await supabaseClient
     .from("cliente")
@@ -117,6 +316,70 @@ async function buscarProximoClienteIdDisponivel() {
   .from("cliente")
 */
 
+function renderizarClientes(clientes) {
+  if (clientes.length === 0) {
+    tabelaClientes.innerHTML = `
+      <tr>
+        <td colspan="5">Nenhum cliente encontrado.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tabelaClientes.innerHTML = "";
+
+  clientes.forEach(function (cliente) {
+    const linha = document.createElement("tr");
+
+    linha.innerHTML = `
+      <td>${cliente.clienteid}</td>
+      <td>${formatarTipoCliente(cliente.tipo_cliente)}</td>
+      <td>${cliente.cpf_cnpj_cliente}</td>
+      <td>${cliente.nome_cliente}</td>
+      <td class="coluna-acoes"></td>
+    `;
+
+    const botaoEditar = document.createElement("button");
+    botaoEditar.textContent = "Editar";
+    botaoEditar.className = "btn-editar";
+    botaoEditar.type = "button";
+    botaoEditar.addEventListener("click", function () {
+      prepararEdicao(cliente);
+    });
+
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.textContent = "Excluir";
+    botaoExcluir.className = "btn-excluir";
+    botaoExcluir.type = "button";
+    botaoExcluir.addEventListener("click", function () {
+      excluirCliente(cliente);
+    });
+
+    linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
+    linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
+
+    tabelaClientes.appendChild(linha);
+  });
+}
+
+function filtrarClientes() {
+  const termo = pesquisaClienteInput.value.toLowerCase().trim();
+
+  if (!termo) {
+    renderizarClientes(clientesCarregados);
+    return;
+  }
+
+  const filtrados = clientesCarregados.filter(function (cliente) {
+    return (
+      cliente.nome_cliente.toLowerCase().includes(termo) ||
+      String(cliente.clienteid).includes(termo)
+    );
+  });
+
+  renderizarClientes(filtrados);
+}
+
 async function carregarClientes() {
   /*
     Faz um SELECT na tabela cliente.
@@ -154,6 +417,7 @@ async function carregarClientes() {
     mostramos uma mensagem dizendo que não há registros.
   */
   if (data.length === 0) {
+    clientesCarregados = [];
     tabelaClientes.innerHTML = `
       <tr>
         <td colspan="5">Nenhum cliente cadastrado.</td>
@@ -162,87 +426,8 @@ async function carregarClientes() {
     return;
   }
 
-  /*
-    Limpamos o corpo da tabela antes de preencher.
-    Isso evita duplicar linhas quando recarregamos os clientes.
-  */
-  tabelaClientes.innerHTML = "";
-
-  /*
-    Percorremos a lista de clientes retornada pelo Supabase.
-
-    Para cada cliente, criamos uma linha <tr>.
-  */
-  data.forEach(function (cliente) {
-    const linha = document.createElement("tr");
-
-    /*
-      Criamos as colunas principais da linha.
-
-      A última coluna recebe a classe "coluna-acoes".
-      Nessa coluna colocaremos os botões Editar e Excluir.
-    */
-    linha.innerHTML = `
-      <td>${cliente.clienteid}</td>
-      <td>${formatarTipoCliente(cliente.tipo_cliente)}</td>
-      <td>${cliente.cpf_cnpj_cliente}</td>
-      <td>${cliente.nome_cliente}</td>
-      <td class="coluna-acoes"></td>
-    `;
-
-    /*
-      ============================================
-      BOTÃO EDITAR
-      ============================================
-    */
-
-    const botaoEditar = document.createElement("button");
-
-    botaoEditar.textContent = "Editar";
-    botaoEditar.className = "btn-editar";
-    botaoEditar.type = "button";
-
-    /*
-      Quando clicar no botão Editar,
-      chamamos a função prepararEdicao
-      passando o cliente da linha atual.
-    */
-    botaoEditar.addEventListener("click", function () {
-      prepararEdicao(cliente);
-    });
-
-    /*
-      ============================================
-      BOTÃO EXCLUIR
-      ============================================
-    */
-
-    const botaoExcluir = document.createElement("button");
-
-    botaoExcluir.textContent = "Excluir";
-    botaoExcluir.className = "btn-excluir";
-    botaoExcluir.type = "button";
-
-    /*
-      Quando clicar no botão Excluir,
-      chamamos a função excluirCliente
-      passando o cliente da linha atual.
-    */
-    botaoExcluir.addEventListener("click", function () {
-      excluirCliente(cliente);
-    });
-
-    /*
-      Adicionamos os botões dentro da coluna Ações.
-    */
-    linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
-    linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
-
-    /*
-      Adicionamos a linha pronta dentro do tbody da tabela.
-    */
-    tabelaClientes.appendChild(linha);
-  });
+  clientesCarregados = data;
+  filtrarClientes();
 }
 
 /*
@@ -269,13 +454,9 @@ function prepararEdicao(cliente) {
   cpfCnpjClienteInput.value = cliente.cpf_cnpj_cliente;
   nomeClienteInput.value = cliente.nome_cliente;
 
-  /*
-    Neste exemplo, vamos permitir editar apenas o nome.
+  atualizarPlaceholderCpfCnpj();
+  aplicarMascaraCpfCnpj();
 
-    Por isso:
-    - bloqueamos o tipo;
-    - bloqueamos o CPF/CNPJ.
-  */
   tipoClienteInput.disabled = false;
   cpfCnpjClienteInput.readOnly = false;
 
@@ -355,6 +536,26 @@ async function salvarCliente() {
   const tipoCliente = tipoClienteInput.value;
   const cpfCnpjCliente = cpfCnpjClienteInput.value;
   const nomeCliente = nomeClienteInput.value;
+
+  const erroCpfCnpj = validarDigitosCpfCnpj(tipoCliente, cpfCnpjCliente);
+  if (erroCpfCnpj) {
+    mostrarMensagem(erroCpfCnpj, "erro");
+    return;
+  }
+
+  let cpfCnpjDuplicado;
+  try {
+    cpfCnpjDuplicado = await verificarCpfCnpjDuplicado(cpfCnpjCliente, null);
+  } catch (error) {
+    mostrarMensagem("Erro ao verificar CPF/CNPJ: " + error.message, "erro");
+    return;
+  }
+
+  if (cpfCnpjDuplicado) {
+    mostrarMensagem("CPF/CNPJ já cadastrado para outro cliente.", "erro");
+    return;
+  }
+
   let proximoClienteId;
 
   try {
@@ -419,50 +620,49 @@ async function salvarCliente() {
 */
 
 async function atualizarNomeCliente() {
-  /*
-    Pegamos o ID do cliente que está sendo editado.
-  */
   const clienteId = clienteIdInput.value;
-
-  /*
-    Pegamos o novo nome digitado.
-  */
+  const tipoCliente = tipoClienteInput.value;
+  const cpfCnpjCliente = cpfCnpjClienteInput.value;
   const nomeCliente = nomeClienteInput.value;
 
-  /*
-    Atualizamos somente a coluna nome_cliente.
+  const erroCpfCnpj = validarDigitosCpfCnpj(tipoCliente, cpfCnpjCliente);
+  if (erroCpfCnpj) {
+    mostrarMensagem(erroCpfCnpj, "erro");
+    return;
+  }
 
-    O filtro .eq("clienteid", clienteId) é essencial.
-    Ele informa qual registro será atualizado.
-  */
+  let cpfCnpjDuplicado;
+  try {
+    cpfCnpjDuplicado = await verificarCpfCnpjDuplicado(
+      cpfCnpjCliente,
+      clienteId,
+    );
+  } catch (error) {
+    mostrarMensagem("Erro ao verificar CPF/CNPJ: " + error.message, "erro");
+    return;
+  }
+
+  if (cpfCnpjDuplicado) {
+    mostrarMensagem("CPF/CNPJ já cadastrado para outro cliente.", "erro");
+    return;
+  }
+
   const { error } = await supabaseClient
     .from("cliente")
     .update({
+      tipo_cliente: tipoCliente,
+      cpf_cnpj_cliente: cpfCnpjCliente,
       nome_cliente: nomeCliente,
     })
     .eq("clienteid", clienteId);
 
-  /*
-    Se houver erro, mostramos a mensagem e paramos.
-  */
   if (error) {
     mostrarMensagem("Erro ao atualizar cliente: " + error.message, "erro");
     return;
   }
 
-  /*
-    Se deu certo, mostramos mensagem de sucesso.
-  */
-  mostrarMensagem("Nome atualizado com sucesso!", "sucesso");
-
-  /*
-    Saímos do modo edição.
-  */
   cancelarEdicao();
-
-  /*
-    Recarregamos a tabela para mostrar o nome atualizado.
-  */
+  mostrarMensagem("Cliente atualizado com sucesso!", "sucesso");
   carregarClientes();
 }
 
@@ -579,6 +779,24 @@ formCliente.addEventListener("submit", async function (evento) {
 btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
+
+/*
+  ============================================
+  MÁSCARA AUTOMÁTICA DE CPF / CNPJ
+  ============================================
+
+  Quando o tipo muda, limpa o campo e atualiza o placeholder.
+  Quando o usuário digita, aplica a máscara em tempo real.
+*/
+
+tipoClienteInput.addEventListener("change", function () {
+  cpfCnpjClienteInput.value = "";
+  atualizarPlaceholderCpfCnpj();
+});
+
+cpfCnpjClienteInput.addEventListener("input", aplicarMascaraCpfCnpj);
+
+pesquisaClienteInput.addEventListener("input", filtrarClientes);
 
 /*
   ============================================

@@ -11,7 +11,7 @@
   <body>
     <nav class="navbar">
       <ul>
-        <li><a href="home.html">Inicio</a></li>
+        <li><a href="home.html">Ínicio</a></li>
         <li><a href="cadastrodeclientes.html">Clientes</a></li>
         <li><a href="cadastrodecategorias.html">Categorias</a></li>
         <li><a href="cadastrodeprodutos.html">Produtos</a></li>
@@ -156,24 +156,34 @@
         </div>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Descricao do produto</th>
-            <th>Qntd.</th>
-            <th>Valor unitario</th>
-            <th>Valor total</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
+      <div class="barra-pesquisa">
+        <input
+          type="text"
+          id="pesquisaItemOrcamento"
+          placeholder="Pesquisar por ID ou descrição do produto..."
+        />
+      </div>
 
-        <tbody id="tabelaOrcamento">
-          <tr>
-            <td colspan="6">Carregando itens do orçamento...</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Descrição do produto</th>
+              <th>Qntd.</th>
+              <th>Valor unitário</th>
+              <th>Valor total</th>
+              <th id="thAcoes">Ações</th>
+            </tr>
+          </thead>
+
+          <tbody id="tabelaOrcamento">
+            <tr>
+              <td colspan="6">Carregando itens do orçamento...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
       <script src="../JS/orcamento.js"></script>

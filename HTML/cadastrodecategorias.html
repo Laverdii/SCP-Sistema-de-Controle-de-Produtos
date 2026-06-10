@@ -68,25 +68,34 @@
       <!-- Aqui aparecerão mensagens como: "Categoria salva com sucesso" "Erro ao salvar categoria" "Categoria excluída com sucesso" -->
       <p id="mensagem" class="mensagem"></p>
       <h2>Categorias Cadastradas</h2>
+      <div class="barra-pesquisa">
+        <input
+          type="text"
+          id="pesquisaCategoria"
+          placeholder="Pesquisar por código ou descrição..."
+        />
+      </div>
 
       <!-- Tabela onde as categorias serão exibidos -->
-      <table>
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Descrição</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
 
-        <!-- O tbody começa com uma mensagem.
-           Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
-        <tbody id="tabelaCategorias">
-          <tr>
-            <td colspan="2">Carregando categorias...</td>
-          </tr>
-        </tbody>
-      </table>
+          <!-- O tbody começa com uma mensagem.
+             Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
+          <tbody id="tabelaCategorias">
+            <tr>
+              <td colspan="2">Carregando categorias...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 

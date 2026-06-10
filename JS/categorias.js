@@ -21,12 +21,15 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const formCategoria = document.getElementById("formCategoria");
 const tabelaCategorias = document.getElementById("tabelaCategorias");
 const mensagem = document.getElementById("mensagem");
+const pesquisaCategoriaInput = document.getElementById("pesquisaCategoria");
 
 const CategoriaIdInput = document.getElementById("CategoriaId");
 const descCategoriaInput = document.getElementById("descCategoria");
 
 const btnSalvar = document.getElementById("btnSalvar");
 const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
+
+let categoriasCarregadas = [];
 
 /*
   ============================================
@@ -91,130 +94,96 @@ async function buscarProximoCategoriaIdDisponivel() {
   .from("Categoria")
 */
 
-async function carregarCategorias() {
-  /*
-    Faz um SELECT na tabela Categoria.
-
-    Estamos buscando as colunas:
-    - Categoriaid
-    - tipo_Categoria
-    - cpf_cnpj_Categoria
-    - nome_Categoria
-
-    E ordenando pelo Categoriaid em ordem crescente.
-  */
-  const { data, error } = await supabaseClient
-    .from("categoria_produto")
-    .select("categoriaprodutoid, ds_categoria_produto")
-    .order("categoriaprodutoid", { ascending: true });
-
-  /*
-    Se der erro na consulta, mostramos uma mensagem na tabela
-    e também uma mensagem de erro acima da listagem.
-  */
-  if (error) {
+function renderizarCategorias(categorias) {
+  if (categorias.length === 0) {
     tabelaCategorias.innerHTML = `
       <tr>
-        <td colspan="2">Erro ao carregar as categorias.</td>
-      </tr>
-    `;
-
-    mostrarMensagem("Erro ao buscar as categorias: " + error.message, "erro");
-    return;
-  }
-
-  /*
-    Se a consulta funcionar, mas não houver nenhum Categoria,
-    mostramos uma mensagem dizendo que não há registros.
-  */
-  if (data.length === 0) {
-    tabelaCategorias.innerHTML = `
-      <tr>
-        <td colspan="2">Nenhuma categoria cadastrada.</td>
+        <td colspan="3">Nenhuma categoria encontrada.</td>
       </tr>
     `;
     return;
   }
 
-  /*
-    Limpamos o corpo da tabela antes de preencher.
-    Isso evita duplicar linhas quando recarregamos os Categorias.
-  */
   tabelaCategorias.innerHTML = "";
 
-  /*
-    Percorremos a lista de Categorias retornada pelo Supabase.
-
-    Para cada Categoria, criamos uma linha <tr>.
-  */
-  data.forEach(function (Categoria) {
+  categorias.forEach(function (Categoria) {
     const linha = document.createElement("tr");
 
-    /*
-      Criamos as colunas principais da linha.
-
-      A última coluna recebe a classe "coluna-acoes".
-      Nessa coluna colocaremos os botões Editar e Excluir.
-    */
     linha.innerHTML = `
       <td>${Categoria.categoriaprodutoid}</td>
       <td>${Categoria.ds_categoria_produto}</td>
       <td class="coluna-acoes"></td>
     `;
 
-    /*
-      ============================================
-      BOTÃO EDITAR
-      ============================================
-    */
-
     const botaoEditar = document.createElement("button");
-
     botaoEditar.textContent = "Editar";
     botaoEditar.className = "btn-editar";
     botaoEditar.type = "button";
-
-    /*
-      Quando clicar no botão Editar,
-      chamamos a função prepararEdicao
-      passando o Categoria da linha atual.
-    */
     botaoEditar.addEventListener("click", function () {
       prepararEdicao(Categoria);
     });
 
-    /*
-      ============================================
-      BOTÃO EXCLUIR
-      ============================================
-    */
-
     const botaoExcluir = document.createElement("button");
-
     botaoExcluir.textContent = "Excluir";
     botaoExcluir.className = "btn-excluir";
     botaoExcluir.type = "button";
-
-    /*
-      Quando clicar no botão Excluir,
-      chamamos a função excluirCategoria
-      passando o Categoria da linha atual.
-    */
     botaoExcluir.addEventListener("click", function () {
       excluirCategoria(Categoria);
     });
 
-    /*
-      Adicionamos os botões dentro da coluna Ações.
-    */
     linha.querySelector(".coluna-acoes").appendChild(botaoEditar);
     linha.querySelector(".coluna-acoes").appendChild(botaoExcluir);
 
-    /*
-      Adicionamos a linha pronta dentro do tbody da tabela.
-    */
     tabelaCategorias.appendChild(linha);
   });
+}
+
+function filtrarCategorias() {
+  const termo = pesquisaCategoriaInput.value.toLowerCase().trim();
+
+  if (!termo) {
+    renderizarCategorias(categoriasCarregadas);
+    return;
+  }
+
+  const filtradas = categoriasCarregadas.filter(function (categoria) {
+    return (
+      String(categoria.categoriaprodutoid).includes(termo) ||
+      categoria.ds_categoria_produto.toLowerCase().includes(termo)
+    );
+  });
+
+  renderizarCategorias(filtradas);
+}
+
+async function carregarCategorias() {
+  const { data, error } = await supabaseClient
+    .from("categoria_produto")
+    .select("categoriaprodutoid, ds_categoria_produto")
+    .order("categoriaprodutoid", { ascending: true });
+
+  if (error) {
+    tabelaCategorias.innerHTML = `
+      <tr>
+        <td colspan="3">Erro ao carregar as categorias.</td>
+      </tr>
+    `;
+    mostrarMensagem("Erro ao buscar as categorias: " + error.message, "erro");
+    return;
+  }
+
+  if (data.length === 0) {
+    categoriasCarregadas = [];
+    tabelaCategorias.innerHTML = `
+      <tr>
+        <td colspan="3">Nenhuma categoria cadastrada.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  categoriasCarregadas = data;
+  filtrarCategorias();
 }
 
 /*
@@ -481,14 +450,14 @@ async function atualizarNomeCategoria() {
   }
 
   /*
-    Se deu certo, mostramos mensagem de sucesso.
-  */
-  mostrarMensagem("Categoria atualizada com sucesso!", "sucesso");
-
-  /*
     Saímos do modo edição.
   */
   cancelarEdicao();
+
+  /*
+    Se deu certo, mostramos mensagem de sucesso.
+  */
+  mostrarMensagem("Categoria atualizada com sucesso!", "sucesso");
 
   /*
     Recarregamos a tabela para mostrar o nome atualizado.
@@ -612,13 +581,6 @@ btnCancelarEdicao.addEventListener("click", function () {
   cancelarEdicao();
 });
 
-/*
-  ============================================
-  CARREGAMENTO INICIAL DA PÁGINA
-  ============================================
-
-  Assim que o arquivo JavaScript é carregado,
-  buscamos os Categorias no Supabase.
-*/
+pesquisaCategoriaInput.addEventListener("input", filtrarCategorias);
 
 carregarCategorias();
