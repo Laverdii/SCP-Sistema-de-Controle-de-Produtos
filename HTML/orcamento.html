@@ -58,12 +58,16 @@
         </table>
       </div>
 
-      <!-- ── Modal: Atribuir Orçamento ─────────────────────────────── -->
+      <!-- ── Modal: Atribuir / Editar Orçamento ─────────────────────── -->
       <div id="modalAtribuirOrcamento" class="modal-overlay" style="display: none">
         <div class="modal-box modal-box--large">
           <div class="modal-header">
-            <h2>Atribuir Orçamento</h2>
-            <button type="button" id="btnFecharModalAtribuir" class="btn-fechar-modal">
+            <h2 id="modalAtribuirTitulo">Atribuir Orçamento</h2>
+            <button
+              type="button"
+              id="btnFecharModalAtribuir"
+              class="btn-fechar-modal"
+            >
               &times;
             </button>
           </div>
@@ -95,18 +99,17 @@
                 name="dt_orcamento"
                 required
                 readonly
-                placeholder="Gerado automaticamente"
               />
             </div>
 
             <div class="campo">
-              <label for="dt_validade_orcamento">Data de validade do orçamento:</label>
+              <label for="dt_validade_orcamento"
+                >Data de validade do orçamento:</label
+              >
               <input
                 type="date"
                 id="dt_validade_orcamento"
                 name="dt_validade_orcamento"
-                readonly
-                placeholder="Gerado automaticamente"
               />
             </div>
 
@@ -117,19 +120,13 @@
                 id="vl_total_orcamento"
                 name="vl_total_orcamento"
                 readonly
-                placeholder="Gerado automaticamente"
+                placeholder="Calculado automaticamente"
               />
             </div>
 
             <div class="acoes">
-              <button type="reset" class="btn-limpar">Limpar</button>
-
-              <button
-                type="button"
-                id="btnCancelarEdicao"
-                class="btn-cancelar-edicao"
-              >
-                Cancelar edição
+              <button type="button" id="btnCancelarModal" class="btn-limpar">
+                Cancelar
               </button>
 
               <button type="submit" id="btnSalvar" class="btn-salvar" disabled>
@@ -140,91 +137,71 @@
 
           <p id="mensagem" class="mensagem"></p>
 
-          <div class="cabecalho-itens-orcamento">
-            <h2>Itens do orçamento</h2>
-            <div class="acoes-orcamento">
-              <button
-                type="button"
-                id="btnEditarItens"
-                class="btn-editar"
-                style="display: none"
-              >
-                Editar itens
-              </button>
-
-              <button
-                type="button"
-                id="btnExcluirOrcamento"
-                class="btn-excluir"
-                style="display: none"
-              >
-                Excluir
-              </button>
-            </div>
-          </div>
-
-          <form
-            id="formItemOrcamento"
-            class="form-item-orcamento"
-            style="display: none"
-          >
-            <input type="hidden" id="produtoOriginalItem" />
-
-            <div class="campo">
-              <label for="produtoItemOrcamento">Produto:</label>
-              <select id="produtoItemOrcamento" required>
-                <option value="">Selecione</option>
-              </select>
+          <!-- Seção de itens — visível apenas no modo edição -->
+          <div id="secaoItens" style="display: none">
+            <div class="cabecalho-itens-orcamento">
+              <h3>Itens do orçamento</h3>
             </div>
 
-            <div class="campo">
-              <label for="quantidadeItemOrcamento">Quantidade:</label>
+            <form id="formItemOrcamento" class="form-item-orcamento">
+              <input type="hidden" id="produtoOriginalItem" />
+
+              <div class="campo">
+                <label for="produtoItemOrcamento">Produto:</label>
+                <select id="produtoItemOrcamento" required>
+                  <option value="">Selecione</option>
+                </select>
+              </div>
+
+              <div class="campo">
+                <label for="quantidadeItemOrcamento">Quantidade:</label>
+                <input
+                  type="number"
+                  id="quantidadeItemOrcamento"
+                  min="1"
+                  step="1"
+                  required
+                />
+              </div>
+
+              <div class="acoes">
+                <button type="button" id="btnCancelarItem" class="btn-limpar">
+                  Cancelar item
+                </button>
+
+                <button type="submit" id="btnSalvarItem" class="btn-salvar">
+                  Adicionar item
+                </button>
+              </div>
+            </form>
+
+            <div class="barra-pesquisa">
               <input
-                type="number"
-                id="quantidadeItemOrcamento"
-                min="1"
-                step="1"
-                required
+                type="text"
+                id="pesquisaItemOrcamento"
+                placeholder="Pesquisar por ID ou descrição do produto..."
               />
             </div>
 
-            <div class="acoes">
-              <button type="button" id="btnCancelarItem" class="btn-limpar">
-                Cancelar item
-              </button>
-
-              <button type="submit" id="btnSalvarItem" class="btn-salvar">
-                Adicionar item
-              </button>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Descrição</th>
+                    <th>Qntd.</th>
+                    <th>Valor unitário</th>
+                    <th>Valor total</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelaItensEdicao">
+                  <tr>
+                    <td colspan="6">Carregando itens...</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </form>
-
-          <div class="barra-pesquisa">
-            <input
-              type="text"
-              id="pesquisaItemOrcamento"
-              placeholder="Pesquisar por ID ou descrição do produto..."
-            />
-          </div>
-
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Produto</th>
-                  <th>Descrição do produto</th>
-                  <th>Qntd.</th>
-                  <th>Valor unitário</th>
-                  <th>Valor total</th>
-                  <th id="thAcoes">Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tabelaOrcamento">
-                <tr>
-                  <td colspan="6">Selecione um cliente para ver os itens do orçamento.</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -233,8 +210,15 @@
       <div id="modalVerItens" class="modal-overlay" style="display: none">
         <div class="modal-box modal-box--large">
           <div class="modal-header">
-            <h2>Itens do Orçamento <span id="modalVerItensNumero"></span></h2>
-            <button type="button" id="btnFecharModalVerItens" class="btn-fechar-modal">
+            <h2>
+              Itens do Orçamento
+              <span id="modalVerItensNumero"></span>
+            </h2>
+            <button
+              type="button"
+              id="btnFecharModalVerItens"
+              class="btn-fechar-modal"
+            >
               &times;
             </button>
           </div>
