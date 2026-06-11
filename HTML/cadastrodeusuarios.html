@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cadastro de categorias</title>
+    <title>Cadastro de Usuários</title>
     <link rel="stylesheet" href="../style.css" />
     <link rel="icon" href="../img/favicon.ico" sizes="any" />
   </head>
@@ -13,45 +13,51 @@
       <ul>
         <li><a href="home.html">Ínicio</a></li>
         <li><a href="cadastrodeclientes.html">Clientes</a></li>
-        <li>
-          <a class="ativo" href="cadastrodecategorias.html">Categorias</a>
-        </li>
+        <li><a href="cadastrodecategorias.html">Categorias</a></li>
         <li><a href="cadastrodeprodutos.html">Produtos</a></li>
         <li><a href="orcamento.html">Orçamento</a></li>
-        <li><a href="cadastrodeusuarios.html">Usuários</a></li>
+        <li><a class="ativo" href="cadastrodeusuarios.html">Usuários</a></li>
         <li><a href="telalogin.html">Sair</a></li>
       </ul>
     </nav>
     <main class="container">
-      <h1>Cadastro de Categorias</h1>
-      <form id="formCategoria" class="form-categoria">
-        <!-- O campo "Código" é gerado automaticamente, por isso é readonly. -->
+      <h1>Cadastro de Usuários</h1>
+      <form id="formUsuario" class="form-usuario">
         <div class="campo">
-          <label for="CategoriaId">Código da categoria:</label>
+          <label for="usuarioId">Código:</label>
           <input
             type="text"
-            id="CategoriaId"
-            name="codigo"
+            id="usuarioId"
+            name="usuarioId"
             readonly
             placeholder="Gerado automaticamente"
           />
         </div>
 
         <div class="campo">
-          <label for="descCategoria">Descrição:</label>
+          <label for="nomeUsuario">Nome do usuário:</label>
           <input
             type="text"
-            id="descCategoria"
-            name="descricao"
+            id="nomeUsuario"
+            name="nomeUsuario"
             required
-            placeholder="Digite a descrição da categoria"
+            placeholder="Digite o nome do usuário"
           />
         </div>
 
-        <!-- Botões do formulário -->
+        <div class="campo nome">
+          <label for="senhaUsuario">Senha:</label>
+          <input
+            type="password"
+            id="senhaUsuario"
+            name="senhaUsuario"
+            required
+            placeholder="Digite a senha"
+          />
+        </div>
+
         <div class="acoes">
           <button type="reset" class="btn-limpar">Limpar</button>
-
           <button
             type="button"
             id="btnCancelarEdicao"
@@ -59,57 +65,46 @@
           >
             Cancelar edição
           </button>
-
           <button type="submit" id="btnSalvar" class="btn-salvar">
             Salvar
           </button>
         </div>
       </form>
 
-      <!-- Aqui aparecerão mensagens como: "Categoria salva com sucesso" "Erro ao salvar categoria" "Categoria excluída com sucesso" -->
       <p id="mensagem" class="mensagem"></p>
-      <h2>Categorias Cadastradas</h2>
+      <h2>Usuários Cadastrados</h2>
       <div class="barra-pesquisa">
         <div class="barra-pesquisa-wrapper">
           <input
             type="text"
-            id="pesquisaCategoria"
-            placeholder="Pesquisar por código ou descrição..."
+            id="pesquisaUsuario"
+            placeholder="Pesquisar por nome ou código..."
           />
-          <button type="button" class="btn-pesquisar-inline" id="btnPesquisarCategoria" title="Pesquisar">
+          <button type="button" class="btn-pesquisar-inline" id="btnPesquisarUsuario" title="Pesquisar">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
         </div>
-        <span class="aviso-min-chars" id="avisoCategoria">Digite ao menos 4 caracteres para buscar por descrição.</span>
+        <span class="aviso-min-chars" id="avisoUsuario">Digite ao menos 4 caracteres para buscar por nome.</span>
       </div>
 
-      <!-- Tabela onde as categorias serão exibidos -->
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
               <th>Código</th>
-              <th>Descrição</th>
+              <th>Nome do Usuário</th>
               <th>Ações</th>
             </tr>
           </thead>
-
-          <!-- O tbody começa com uma mensagem.
-             Depois o JavaScript substitui esse conteúdo pelos dados do Supabase. -->
-          <tbody id="tabelaCategorias">
+          <tbody id="tabelaUsuarios">
             <tr>
-              <td colspan="2">Carregando categorias...</td>
+              <td colspan="3">Carregando usuários...</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <!-- Biblioteca JavaScript do Supabase. Ela precisa ser carregada antes do nosso .js. -->
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-      <!-- Nosso arquivo JavaScript separado -->
-      <script src="../JS/categorias.js"></script>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../JS/usuarios.js"></script>
   </body>
 </html>
-
-<!-- FALTA O JS COM OS BOTEOES EXLUIR E EDITAR-->

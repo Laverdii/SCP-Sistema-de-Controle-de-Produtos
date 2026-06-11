@@ -15,7 +15,8 @@
         <li><a href="cadastrodeclientes.html">Clientes</a></li>
         <li><a href="cadastrodecategorias.html">Categorias</a></li>
         <li><a href="cadastrodeprodutos.html">Produtos</a></li>
-        <li><a class="ativo" href="orcamento.html">Orçamentos</a></li>
+        <li><a class="ativo" href="orcamento.html">Orçamento</a></li>
+        <li><a href="cadastrodeusuarios.html">Usuários</a></li>
         <li><a href="telalogin.html">Sair</a></li>
       </ul>
     </nav>
@@ -203,6 +204,11 @@
                 </tbody>
               </table>
             </div>
+
+            <div class="rodape-total-orcamento">
+              <span>Valor total do orçamento:</span>
+              <strong id="totalEdicaoItens">R$ 0,00</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -224,11 +230,26 @@
             </button>
           </div>
 
+          <div class="barra-pesquisa">
+            <div class="barra-pesquisa-wrapper">
+              <input
+                type="text"
+                id="pesquisaVerItens"
+                placeholder="Pesquisar por categoria, ID ou descrição do produto..."
+              />
+              <button type="button" class="btn-pesquisar-inline" id="btnPesquisarVerItens" title="Pesquisar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
+            </div>
+            <span class="aviso-min-chars" id="avisoVerItens">Digite ao menos 3 caracteres para pesquisar.</span>
+          </div>
+
           <div class="table-wrapper">
             <table>
               <thead>
                 <tr>
                   <th>ID Produto</th>
+                  <th>Categoria</th>
                   <th>Descrição</th>
                   <th>Observação</th>
                   <th>Quantidade</th>
@@ -238,10 +259,15 @@
               </thead>
               <tbody id="tabelaVerItens">
                 <tr>
-                  <td colspan="6">Carregando itens...</td>
+                  <td colspan="7">Carregando itens...</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="rodape-total-orcamento">
+            <span>Valor total do orçamento:</span>
+            <strong id="totalVerItens">R$ 0,00</strong>
           </div>
         </div>
       </div>

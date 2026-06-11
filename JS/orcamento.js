@@ -34,6 +34,7 @@ const produtoOriginalItemInput = document.getElementById("produtoOriginalItem");
 const btnCancelarItem = document.getElementById("btnCancelarItem");
 const btnSalvarItem = document.getElementById("btnSalvarItem");
 const tabelaItensEdicao = document.getElementById("tabelaItensEdicao");
+const totalEdicaoItens = document.getElementById("totalEdicaoItens");
 const pesquisaItemOrcamentoInput = document.getElementById("pesquisaItemOrcamento");
 const btnPesquisarItemOrcamento = document.getElementById("btnPesquisarItemOrcamento");
 const avisoItemOrcamento = document.getElementById("avisoItemOrcamento");
@@ -43,11 +44,16 @@ const modalVerItens = document.getElementById("modalVerItens");
 const btnFecharModalVerItens = document.getElementById("btnFecharModalVerItens");
 const modalVerItensNumero = document.getElementById("modalVerItensNumero");
 const tabelaVerItens = document.getElementById("tabelaVerItens");
+const pesquisaVerItensInput = document.getElementById("pesquisaVerItens");
+const btnPesquisarVerItens = document.getElementById("btnPesquisarVerItens");
+const avisoVerItens = document.getElementById("avisoVerItens");
+const totalVerItens = document.getElementById("totalVerItens");
 
 const DIAS_VALIDADE_ORCAMENTO = 7;
 
 let produtos = [];
 let itensOrcamentoCarregados = [];
+let itensVerItensCarregados = [];
 let listaOrcamentosCarregados = [];
 let modoEdicaoOrcamento = null; // null = criar | number = orcamentoid em edição
 
@@ -140,6 +146,8 @@ function renderizarListaOrcamentos(lista) {
       ? orcamento.cliente.nome_cliente
       : "-";
     const linha = document.createElement("tr");
+    linha.className = "linha-clicavel";
+    linha.title = "Clique para ver os itens do orçamento";
 
     linha.innerHTML = `
       <td>${orcamento.orcamentoid}</td>
@@ -150,15 +158,12 @@ function renderizarListaOrcamentos(lista) {
       <td></td>
     `;
 
-    const tdAcoes = linha.querySelector("td:last-child");
-
-    const btnVerItens = document.createElement("button");
-    btnVerItens.textContent = "Ver itens";
-    btnVerItens.className = "btn-editar";
-    btnVerItens.type = "button";
-    btnVerItens.addEventListener("click", function () {
+    linha.addEventListener("click", function (e) {
+      if (e.target.tagName === "BUTTON" || e.target.closest("button")) return;
       abrirModalVerItens(orcamento.orcamentoid);
     });
+
+    const tdAcoes = linha.querySelector("td:last-child");
 
     const btnEditar = document.createElement("button");
     btnEditar.textContent = "Editar";
@@ -176,7 +181,6 @@ function renderizarListaOrcamentos(lista) {
       excluirOrcamento(orcamento.orcamentoid);
     });
 
-    tdAcoes.appendChild(btnVerItens);
     tdAcoes.appendChild(btnEditar);
     tdAcoes.appendChild(btnExcluir);
 
@@ -254,6 +258,7 @@ function abrirModalParaEditar(orcamento) {
   btnSalvar.disabled = false;
   limparFormularioItem();
   pesquisaItemOrcamentoInput.value = "";
+  totalEdicaoItens.textContent = formatarMoeda(0);
   secaoItens.style.display = "block";
   modalAtribuirOrcamento.style.display = "flex";
   document.body.style.overflow = "hidden";
@@ -290,6 +295,7 @@ async function carregarItensOrcamento() {
 
   if (data.length === 0) {
     itensOrcamentoCarregados = [];
+    totalEdicaoItens.textContent = formatarMoeda(0);
     await atualizarTotalOrcamento(0);
     tabelaItensEdicao.innerHTML = `<tr><td colspan="6">Nenhum item cadastrado para este orçamento.</td></tr>`;
     return;
@@ -299,6 +305,7 @@ async function carregarItensOrcamento() {
     return acc + Number(item.vl_total || 0);
   }, 0);
 
+  totalEdicaoItens.textContent = formatarMoeda(total);
   await atualizarTotalOrcamento(total);
 
   itensOrcamentoCarregados = data;
@@ -545,7 +552,11 @@ async function excluirItemOrcamento(item) {
 
 function abrirModalVerItens(orcamentoId) {
   modalVerItensNumero.textContent = `#${orcamentoId}`;
-  tabelaVerItens.innerHTML = `<tr><td colspan="6">Carregando itens...</td></tr>`;
+  tabelaVerItens.innerHTML = `<tr><td colspan="7">Carregando itens...</td></tr>`;
+  totalVerItens.textContent = formatarMoeda(0);
+  pesquisaVerItensInput.value = "";
+  avisoVerItens.classList.remove("visivel");
+  itensVerItensCarregados = [];
   modalVerItens.style.display = "flex";
   document.body.style.overflow = "hidden";
   carregarItensParaModal(orcamentoId);
@@ -554,51 +565,100 @@ function abrirModalVerItens(orcamentoId) {
 function fecharModalVerItens() {
   modalVerItens.style.display = "none";
   document.body.style.overflow = "";
+  itensVerItensCarregados = [];
+  pesquisaVerItensInput.value = "";
+  avisoVerItens.classList.remove("visivel");
 }
 
 async function carregarItensParaModal(orcamentoId) {
-  let { data, error } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("orcamento_item")
     .select(
-      "produtoid, produtodesc, obs_produto, qt_produto, vl_unitario, vl_total",
+      "produtoid, produtodesc, qt_produto, vl_unitario, vl_total, produto(obs_produto, categoriaprodutoid, categoria_produto(ds_categoria_produto))",
     )
     .eq("orcamentoid", orcamentoId)
     .order("produtoid", { ascending: true });
 
   if (error) {
-    const resultado = await supabaseClient
-      .from("orcamento_item")
-      .select("produtoid, produtodesc, qt_produto, vl_unitario, vl_total")
-      .eq("orcamentoid", orcamentoId)
-      .order("produtoid", { ascending: true });
-
-    if (resultado.error) {
-      tabelaVerItens.innerHTML = `<tr><td colspan="6">Erro ao carregar itens.</td></tr>`;
-      return;
-    }
-
-    data = resultado.data;
+    tabelaVerItens.innerHTML = `<tr><td colspan="7">Erro ao carregar itens.</td></tr>`;
+    totalVerItens.textContent = formatarMoeda(0);
+    return;
   }
 
   if (!data || data.length === 0) {
-    tabelaVerItens.innerHTML = `<tr><td colspan="6">Nenhum item cadastrado para este orçamento.</td></tr>`;
+    tabelaVerItens.innerHTML = `<tr><td colspan="7">Nenhum item cadastrado para este orçamento.</td></tr>`;
+    itensVerItensCarregados = [];
+    totalVerItens.textContent = formatarMoeda(0);
+    return;
+  }
+
+  itensVerItensCarregados = data;
+
+  const total = data.reduce(function (acc, item) {
+    return acc + Number(item.vl_total || 0);
+  }, 0);
+  totalVerItens.textContent = formatarMoeda(total);
+
+  renderizarItensVerItens(data);
+}
+
+function renderizarItensVerItens(itens) {
+  if (itens.length === 0) {
+    tabelaVerItens.innerHTML = `<tr><td colspan="7">Nenhum item encontrado.</td></tr>`;
     return;
   }
 
   tabelaVerItens.innerHTML = "";
 
-  data.forEach(function (item) {
+  itens.forEach(function (item) {
+    const categoria = item.produto && item.produto.categoria_produto
+      ? item.produto.categoria_produto.ds_categoria_produto
+      : "-";
+    const obs = item.produto ? (item.produto.obs_produto || "-") : "-";
     const linha = document.createElement("tr");
     linha.innerHTML = `
       <td>${item.produtoid}</td>
+      <td>${categoria}</td>
       <td>${item.produtodesc || "-"}</td>
-      <td>${item.obs_produto || "-"}</td>
+      <td>${obs}</td>
       <td>${item.qt_produto}</td>
       <td>${formatarMoeda(item.vl_unitario)}</td>
       <td>${formatarMoeda(item.vl_total)}</td>
     `;
     tabelaVerItens.appendChild(linha);
   });
+}
+
+function executarPesquisaVerItens() {
+  const valor = pesquisaVerItensInput.value.trim();
+  const termo = valor.toLowerCase();
+
+  avisoVerItens.classList.remove("visivel");
+
+  if (!valor) {
+    renderizarItensVerItens(itensVerItensCarregados);
+    return;
+  }
+
+  if (valor.length < 3) {
+    avisoVerItens.classList.add("visivel");
+    return;
+  }
+
+  const filtrados = itensVerItensCarregados.filter(function (item) {
+    const categoria = item.produto && item.produto.categoria_produto
+      ? item.produto.categoria_produto.ds_categoria_produto.toLowerCase()
+      : "";
+    const categoriaid = item.produto ? String(item.produto.categoriaprodutoid || "") : "";
+    return (
+      String(item.produtoid).includes(termo) ||
+      (item.produtodesc || "").toLowerCase().includes(termo) ||
+      categoria.includes(termo) ||
+      categoriaid.includes(termo)
+    );
+  });
+
+  renderizarItensVerItens(filtrados);
 }
 
 // ─── Data ─────────────────────────────────────────────────────────
@@ -782,6 +842,18 @@ btnNovoOrcamento.addEventListener("click", abrirModalAtribuir);
 btnCancelarModal.addEventListener("click", fecharModalAtribuir);
 btnFecharModalAtribuir.addEventListener("click", fecharModalAtribuir);
 btnFecharModalVerItens.addEventListener("click", fecharModalVerItens);
+btnPesquisarVerItens.addEventListener("click", executarPesquisaVerItens);
+
+pesquisaVerItensInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") executarPesquisaVerItens();
+});
+
+pesquisaVerItensInput.addEventListener("input", function () {
+  if (pesquisaVerItensInput.value.trim() === "") {
+    avisoVerItens.classList.remove("visivel");
+    renderizarItensVerItens(itensVerItensCarregados);
+  }
+});
 formItemOrcamento.addEventListener("submit", salvarItemOrcamento);
 btnCancelarItem.addEventListener("click", limparFormularioItem);
 btnPesquisarOrcamentos.addEventListener("click", executarPesquisaOrcamentos);

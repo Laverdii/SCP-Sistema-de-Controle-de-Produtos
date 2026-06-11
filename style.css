@@ -69,7 +69,8 @@ h2 {
 /* ─── Forms grid ─────────────────────────────────────────────────── */
 .form-cliente,
 .form-categoria,
-.form-produto {
+.form-produto,
+.form-usuario {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -523,6 +524,33 @@ td {
   color: #333;
 }
 
+/* ─── Clickable table rows ───────────────────────────────────────── */
+tr.linha-clicavel {
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+
+tr.linha-clicavel:hover td {
+  background-color: #eef5fb;
+}
+
+/* ─── Modal footer total ─────────────────────────────────────────── */
+.rodape-total-orcamento {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  border-top: 2px solid #356fa1;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+.rodape-total-orcamento strong {
+  font-size: 1.1rem;
+  color: #356fa1;
+}
+
 /* ─── Responsive — phones (≤ 700px) ─────────────────────────────── */
 @media (max-width: 700px) {
   body {
@@ -547,6 +575,7 @@ td {
   .form-cliente,
   .form-categoria,
   .form-produto,
+  .form-usuario,
   .form-orcamento,
   .form-item-orcamento {
     grid-template-columns: 1fr;
