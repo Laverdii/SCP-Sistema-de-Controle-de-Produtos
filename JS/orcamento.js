@@ -227,8 +227,8 @@ function abrirModalAtribuir() {
   preencherDatasAutomaticas();
   mensagem.textContent = "";
   mensagem.className = "mensagem";
-  modalAtribuirTitulo.textContent = "Atribuir Orçamento";
-  btnSalvar.textContent = "Atribuir orçamento";
+  modalAtribuirTitulo.textContent = "Novo Orçamento";
+  btnSalvar.textContent = "Novo orçamento";
   btnSalvar.disabled = true;
   secaoItens.style.display = "none";
   modalAtribuirOrcamento.style.display = "flex";
