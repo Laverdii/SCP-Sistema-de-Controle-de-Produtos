@@ -146,19 +146,19 @@ function renderizarListaOrcamentos(lista) {
     const nomeCliente = orcamento.cliente
       ? orcamento.cliente.nome_cliente
       : "-";
-    const linha = document.createElement("tr");
-    linha.className = "linha-clicavel";
-    linha.title = "Clique para ver os itens do orçamento";
-
     const hoje = formatarDataParaInput(new Date());
     const vencido = orcamento.dt_validade_orcamento && orcamento.dt_validade_orcamento.slice(0, 10) < hoje;
-    const validadeHtml = `<span${vencido ? ' class="validade-vencida"' : ""}>${formatarDataParaExibicao(orcamento.dt_validade_orcamento)}</span>`;
+
+    const linha = document.createElement("tr");
+    linha.className = "linha-clicavel" + (vencido ? " produto-inativo" : "");
+    linha.title = "Clique para ver os itens do orçamento";
+    
 
     linha.innerHTML = `
       <td>${orcamento.orcamentoid}</td>
       <td>${nomeCliente}</td>
       <td>${formatarDataParaExibicao(orcamento.dt_orcamento)}</td>
-      <td>${validadeHtml}</td>
+      <td>${formatarDataParaExibicao(orcamento.dt_validade_orcamento)}</td>
       <td>${formatarMoeda(orcamento.vl_total_orcamento)}</td>
       <td></td>
     `;
