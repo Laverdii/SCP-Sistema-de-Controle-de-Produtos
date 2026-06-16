@@ -47,4 +47,5 @@ Simular um sistema utilizado em ambientes empresariais.
 Felipe Laverdi
 
 GitHub: github.com/Laverdii
+
 LinkedIn: www.linkedin.com/in/felipe-laverdi
