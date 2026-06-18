@@ -8,6 +8,8 @@ const inputSenha = document.getElementById("senhaUsuario");
 const btnEntrar = document.getElementById("btnEntrar");
 const mensagem = document.getElementById("mensagem");
 
+localStorage.removeItem("scp_usuario_logado");
+
 /*
   Habilita ou desabilita o botão conforme os campos estejam preenchidos.
   O botão só fica ativo quando ambos os campos têm conteúdo.
@@ -36,7 +38,7 @@ btnEntrar.addEventListener("click", async function () {
 
   const { data, error } = await supabaseClient
     .from("usuarios")
-    .select("id")
+    .select("id, usuario")
     .ilike("usuario", usuario)
     .eq("senha", senha)
     .maybeSingle();
@@ -59,6 +61,13 @@ btnEntrar.addEventListener("click", async function () {
 
   mensagem.textContent = "Login realizado! Redirecionando...";
   mensagem.className = "mensagem sucesso";
+  localStorage.setItem(
+    "scp_usuario_logado",
+    JSON.stringify({
+      id: data.id,
+      usuario: data.usuario,
+    })
+  );
 
   setTimeout(function () {
     window.location.href = "home.html";

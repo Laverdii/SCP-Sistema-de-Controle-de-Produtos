@@ -1,6 +1,10 @@
 const SUPABASE_URL = "https://ouuwgxztehzshrtjdehb.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_2tOQkWcuI6Xd06OEEG9D1w_Esm6_e9j";
 
+if (typeof usuarioLogadoEhAdmin === "function" && !usuarioLogadoEhAdmin()) {
+  throw new Error("Acesso negado: somente o usuário ADMIN pode administrar usuários.");
+}
+
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── Main page ────────────────────────────────────────────────────

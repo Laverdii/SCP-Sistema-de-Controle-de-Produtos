@@ -3,24 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Cadastro de Acesso</title>
     <link rel="stylesheet" href="../style.css" />
     <link rel="icon" href="../img/favicon.ico" sizes="any" />
   </head>
   <body class="body-login">
     <main class="container-login">
       <div class="box-login">
-        <h1>Login</h1>
+        <h1>Cadastro</h1>
         <div id="mensagem" class="mensagem"></div>
 
         <div class="campo">
-          <label for="loginUsuario">Usuário:</label>
+          <label for="nomeUsuario">Nome de usuário:</label>
           <input
             type="text"
-            id="loginUsuario"
+            id="nomeUsuario"
             placeholder="Insira seu nome de usuário"
           />
         </div>
+
         <div class="campo">
           <label for="senhaUsuario">Senha:</label>
           <input
@@ -30,16 +31,21 @@
           />
         </div>
 
-        <button id="btnEntrar" class="btn-salvar" disabled>Entrar</button>
+        <button id="btnCadastrar" class="btn-salvar" disabled>Cadastrar</button>
 
         <p class="login-cadastro">
-          Não tem um cadastro?
-          <a href="cadastro.html">Cadastre-se aqui!</a>
+          Já tem cadastro?
+          <a href="telalogin.html">Voltar para o login</a>
+        </p>
+
+        <p class="aviso-cadastro">
+          Este cadastro não é o intuito do projeto principal, somente para
+          liberar acesso ao sistema.
         </p>
       </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../JS/login.js"></script>
+    <script src="../JS/cadastro.js"></script>
   </body>
 </html>

@@ -100,6 +100,32 @@ h2 {
   margin-bottom: 15px;
 }
 
+.login-cadastro {
+  text-align: center;
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+}
+
+.login-cadastro a {
+  color: #356fa1;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.login-cadastro a:hover {
+  text-decoration: underline;
+}
+
+.aviso-cadastro {
+  margin: 10px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
 /* ─── Home page ──────────────────────────────────────────────────── */
 .box-home {
   display: flex;
