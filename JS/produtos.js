@@ -46,14 +46,26 @@ function formatarMoeda(valor) {
   if (valor === null || valor === undefined || valor === "") return "-";
   const numero = parseFloat(valor);
   if (isNaN(numero)) return "-";
-  return "R$ " + numero.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (
+    "R$ " +
+    numero.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
 }
 
 function numeroParaMascara(valor) {
   if (valor === null || valor === undefined || valor === "") return "";
   const numero = parseFloat(valor);
   if (isNaN(numero)) return "";
-  return "R$ " + numero.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (
+    "R$ " +
+    numero.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
 }
 
 function extrairValorNumerico(valorMascarado) {
@@ -70,7 +82,11 @@ function aplicarMascaraMoeda(e) {
   const centavos = parseInt(digits, 10);
   const reais = Math.floor(centavos / 100);
   const cents = centavos % 100;
-  e.target.value = "R$ " + reais.toLocaleString("pt-BR") + "," + String(cents).padStart(2, "0");
+  e.target.value =
+    "R$ " +
+    reais.toLocaleString("pt-BR") +
+    "," +
+    String(cents).padStart(2, "0");
 }
 
 function mostrarMensagem(texto, tipo) {
@@ -121,7 +137,10 @@ async function carregarCategoriasDoSelect() {
     .order("categoriaprodutoid", { ascending: true });
 
   if (error) {
-    mostrarMensagemPrincipal("Erro ao carregar categorias: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao carregar categorias: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -213,11 +232,20 @@ function filtrarProdutos() {
   const obs = filtroObsProdutoInput.value.toLowerCase().trim();
 
   const filtrados = produtosCarregados.filter(function (produto) {
-    if (codProduto && !String(produto.produtoid).includes(codProduto)) return false;
-    if (codCategoria && !String(produto.categoriaprodutoid).includes(codCategoria)) return false;
+    if (codProduto && !String(produto.produtoid).includes(codProduto))
+      return false;
+    if (
+      codCategoria &&
+      !String(produto.categoriaprodutoid).includes(codCategoria)
+    )
+      return false;
     if (desc && !produto.ds_produto.toLowerCase().includes(desc)) return false;
     if (obs && !produto.obs_produto.toLowerCase().includes(obs)) return false;
-    if (statusSelecionados.size > 0 && !statusSelecionados.has(produto.status_produto)) return false;
+    if (
+      statusSelecionados.size > 0 &&
+      !statusSelecionados.has(produto.status_produto)
+    )
+      return false;
     return true;
   });
 
@@ -233,12 +261,17 @@ function filtrarProdutos() {
 async function carregarProdutos() {
   const { data, error } = await supabaseClient
     .from("produto")
-    .select("produtoid, categoriaprodutoid, ds_produto, obs_produto, vl_venda_produto, dt_cadastro_produto, status_produto")
+    .select(
+      "produtoid, categoriaprodutoid, ds_produto, obs_produto, vl_venda_produto, dt_cadastro_produto, status_produto",
+    )
     .order("produtoid", { ascending: true });
 
   if (error) {
     tabelaProdutos.innerHTML = `<tr><td colspan="8">Erro ao carregar Produtos.</td></tr>`;
-    mostrarMensagemPrincipal("Erro ao buscar produtos: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao buscar produtos: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -281,7 +314,9 @@ function prepararEdicao(produto) {
   descProdutoInput.value = produto.ds_produto;
   obsProdutoInput.value = produto.obs_produto;
   valorProdutoInput.value = numeroParaMascara(produto.vl_venda_produto);
-  dataCadastroInput.value = produto.dt_cadastro_produto ? produto.dt_cadastro_produto.substring(0, 10) : "";
+  dataCadastroInput.value = produto.dt_cadastro_produto
+    ? produto.dt_cadastro_produto.substring(0, 10)
+    : "";
   statusProdutoInput.value = produto.status_produto;
   mensagem.textContent = "";
   mensagem.className = "mensagem";
@@ -303,18 +338,25 @@ async function salvarProduto() {
   try {
     proximoProdutoId = await buscarProximoProdutoIdDisponivel();
   } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
+    mostrarMensagem(
+      "Erro ao calcular o próximo código: " + error.message,
+      "erro",
+    );
     return;
   }
 
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
+
   const { error } = await supabaseClient.from("produto").insert({
-    produtoid: proximoProdutoId,
     categoriaprodutoid: categoriaProduto,
     ds_produto: descProduto,
     obs_produto: obsProduto,
     vl_venda_produto: valorProduto,
     dt_cadastro_produto: dataCadastro,
     status_produto: statusProduto,
+    auth_user_id: user.id,
   });
 
   if (error) {
@@ -357,7 +399,9 @@ async function atualizarProduto() {
 }
 
 async function excluirProduto(produto) {
-  const confirmou = confirm("Tem certeza que deseja excluir o produto " + produto.ds_produto + "?");
+  const confirmou = confirm(
+    "Tem certeza que deseja excluir o produto " + produto.ds_produto + "?",
+  );
   if (!confirmou) return;
 
   const { error } = await supabaseClient
@@ -366,7 +410,10 @@ async function excluirProduto(produto) {
     .eq("produtoid", produto.produtoid);
 
   if (error) {
-    mostrarMensagemPrincipal("Erro ao excluir produto: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao excluir produto: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -416,15 +463,22 @@ pillsStatus.forEach(function (pill) {
 
 btnPesquisarFiltros.addEventListener("click", filtrarProdutos);
 
-[filtroCodProdutoInput, filtroCodCategoriaInput, filtroDescProdutoInput, filtroObsProdutoInput].forEach(function (input) {
+[
+  filtroCodProdutoInput,
+  filtroCodCategoriaInput,
+  filtroDescProdutoInput,
+  filtroObsProdutoInput,
+].forEach(function (input) {
   input.addEventListener("keydown", function (e) {
     if (e.key === "Enter") filtrarProdutos();
   });
   input.addEventListener("input", function () {
     const descValor = filtroDescProdutoInput.value.trim();
     const obsValor = filtroObsProdutoInput.value.trim();
-    if (descValor === "" || descValor.length >= 4) avisoDescProduto.classList.remove("visivel");
-    if (obsValor === "" || obsValor.length >= 4) avisoObsProduto.classList.remove("visivel");
+    if (descValor === "" || descValor.length >= 4)
+      avisoDescProduto.classList.remove("visivel");
+    if (obsValor === "" || obsValor.length >= 4)
+      avisoObsProduto.classList.remove("visivel");
   });
 });
 
@@ -436,7 +490,9 @@ btnLimparFiltros.addEventListener("click", function () {
   statusSelecionados.clear();
   avisoDescProduto.classList.remove("visivel");
   avisoObsProduto.classList.remove("visivel");
-  pillsStatus.forEach(function (pill) { pill.classList.remove("ativa"); });
+  pillsStatus.forEach(function (pill) {
+    pill.classList.remove("ativa");
+  });
   filtrarProdutos();
 });
 

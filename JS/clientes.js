@@ -49,28 +49,55 @@ function formatarCPF(valor) {
   const n = valor.replace(/\D/g, "").slice(0, 11);
   if (n.length <= 3) return n;
   if (n.length <= 6) return n.slice(0, 3) + "." + n.slice(3);
-  if (n.length <= 9) return n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6);
-  return n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6, 9) + "-" + n.slice(9);
+  if (n.length <= 9)
+    return n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6);
+  return (
+    n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6, 9) + "-" + n.slice(9)
+  );
 }
 
 function formatarCNPJ(valor) {
   const n = valor.replace(/\D/g, "").slice(0, 14);
   if (n.length <= 2) return n;
   if (n.length <= 5) return n.slice(0, 2) + "." + n.slice(2);
-  if (n.length <= 8) return n.slice(0, 2) + "." + n.slice(2, 5) + "." + n.slice(5);
-  if (n.length <= 12) return n.slice(0, 2) + "." + n.slice(2, 5) + "." + n.slice(5, 8) + "/" + n.slice(8);
-  return n.slice(0, 2) + "." + n.slice(2, 5) + "." + n.slice(5, 8) + "/" + n.slice(8, 12) + "-" + n.slice(12);
+  if (n.length <= 8)
+    return n.slice(0, 2) + "." + n.slice(2, 5) + "." + n.slice(5);
+  if (n.length <= 12)
+    return (
+      n.slice(0, 2) +
+      "." +
+      n.slice(2, 5) +
+      "." +
+      n.slice(5, 8) +
+      "/" +
+      n.slice(8)
+    );
+  return (
+    n.slice(0, 2) +
+    "." +
+    n.slice(2, 5) +
+    "." +
+    n.slice(5, 8) +
+    "/" +
+    n.slice(8, 12) +
+    "-" +
+    n.slice(12)
+  );
 }
 
 function aplicarMascaraCpfCnpj() {
   const tipo = tipoClienteInput.value;
-  if (tipo === "F") cpfCnpjClienteInput.value = formatarCPF(cpfCnpjClienteInput.value);
-  else if (tipo === "J") cpfCnpjClienteInput.value = formatarCNPJ(cpfCnpjClienteInput.value);
+  if (tipo === "F")
+    cpfCnpjClienteInput.value = formatarCPF(cpfCnpjClienteInput.value);
+  else if (tipo === "J")
+    cpfCnpjClienteInput.value = formatarCNPJ(cpfCnpjClienteInput.value);
 }
 
 function atualizarPlaceholderCpfCnpj() {
-  if (tipoClienteInput.value === "F") cpfCnpjClienteInput.placeholder = "000.000.000-00";
-  else if (tipoClienteInput.value === "J") cpfCnpjClienteInput.placeholder = "00.000.000/0000-00";
+  if (tipoClienteInput.value === "F")
+    cpfCnpjClienteInput.placeholder = "000.000.000-00";
+  else if (tipoClienteInput.value === "J")
+    cpfCnpjClienteInput.placeholder = "00.000.000/0000-00";
   else cpfCnpjClienteInput.placeholder = "Digite o CPF ou CNPJ";
 }
 
@@ -109,36 +136,29 @@ function cnpjEhValido(cnpj) {
 function validarDigitosCpfCnpj(tipoCliente, cpfCnpj) {
   const digitos = cpfCnpj.replace(/\D/g, "");
   if (tipoCliente === "F") {
-    if (digitos.length !== 11) return "CPF inválido. O CPF deve ter 11 dígitos.";
-    if (!cpfEhValido(cpfCnpj)) return "CPF inválido. Os dígitos verificadores não conferem.";
+    if (digitos.length !== 11)
+      return "CPF inválido. O CPF deve ter 11 dígitos.";
+    if (!cpfEhValido(cpfCnpj))
+      return "CPF inválido. Os dígitos verificadores não conferem.";
   }
   if (tipoCliente === "J") {
-    if (digitos.length !== 14) return "CNPJ inválido. O CNPJ deve ter 14 dígitos.";
-    if (!cnpjEhValido(cpfCnpj)) return "CNPJ inválido. Os dígitos verificadores não conferem.";
+    if (digitos.length !== 14)
+      return "CNPJ inválido. O CNPJ deve ter 14 dígitos.";
+    if (!cnpjEhValido(cpfCnpj))
+      return "CNPJ inválido. Os dígitos verificadores não conferem.";
   }
   return null;
 }
 
 async function verificarCpfCnpjDuplicado(cpfCnpj, clienteIdAtual) {
-  let query = supabaseClient.from("cliente").select("clienteid").eq("cpf_cnpj_cliente", cpfCnpj);
+  let query = supabaseClient
+    .from("cliente")
+    .select("clienteid")
+    .eq("cpf_cnpj_cliente", cpfCnpj);
   if (clienteIdAtual) query = query.neq("clienteid", clienteIdAtual);
   const { data, error } = await query;
   if (error) throw error;
   return data.length > 0;
-}
-
-async function buscarProximoClienteIdDisponivel() {
-  const { data, error } = await supabaseClient
-    .from("cliente")
-    .select("clienteid")
-    .order("clienteid", { ascending: true });
-  if (error) throw error;
-  let proximoId = 1;
-  for (const cliente of data) {
-    if (cliente.clienteid === proximoId) proximoId++;
-    if (cliente.clienteid > proximoId) break;
-  }
-  return proximoId;
 }
 
 // ─── Main table ───────────────────────────────────────────────────
@@ -221,7 +241,10 @@ async function carregarClientes() {
 
   if (error) {
     tabelaClientes.innerHTML = `<tr><td colspan="5">Erro ao carregar clientes.</td></tr>`;
-    mostrarMensagemPrincipal("Erro ao buscar clientes: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao buscar clientes: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -296,19 +319,15 @@ async function salvarCliente() {
     return;
   }
 
-  let proximoClienteId;
-  try {
-    proximoClienteId = await buscarProximoClienteIdDisponivel();
-  } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
-    return;
-  }
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
 
   const { error } = await supabaseClient.from("cliente").insert({
-    clienteid: proximoClienteId,
     tipo_cliente: tipoCliente,
     cpf_cnpj_cliente: cpfCnpjCliente,
     nome_cliente: nomeCliente,
+    auth_user_id: user.id,
   });
 
   if (error) {
@@ -334,7 +353,10 @@ async function atualizarNomeCliente() {
 
   let cpfCnpjDuplicado;
   try {
-    cpfCnpjDuplicado = await verificarCpfCnpjDuplicado(cpfCnpjCliente, clienteId);
+    cpfCnpjDuplicado = await verificarCpfCnpjDuplicado(
+      cpfCnpjCliente,
+      clienteId,
+    );
   } catch (error) {
     mostrarMensagem("Erro ao verificar CPF/CNPJ: " + error.message, "erro");
     return;
@@ -347,7 +369,11 @@ async function atualizarNomeCliente() {
 
   const { error } = await supabaseClient
     .from("cliente")
-    .update({ tipo_cliente: tipoCliente, cpf_cnpj_cliente: cpfCnpjCliente, nome_cliente: nomeCliente })
+    .update({
+      tipo_cliente: tipoCliente,
+      cpf_cnpj_cliente: cpfCnpjCliente,
+      nome_cliente: nomeCliente,
+    })
     .eq("clienteid", clienteId);
 
   if (error) {
@@ -360,7 +386,9 @@ async function atualizarNomeCliente() {
 }
 
 async function excluirCliente(cliente) {
-  const confirmou = confirm("Tem certeza que deseja excluir o cliente " + cliente.nome_cliente + "?");
+  const confirmou = confirm(
+    "Tem certeza que deseja excluir o cliente " + cliente.nome_cliente + "?",
+  );
   if (!confirmou) return;
 
   const { error } = await supabaseClient
@@ -369,7 +397,10 @@ async function excluirCliente(cliente) {
     .eq("clienteid", cliente.clienteid);
 
   if (error) {
-    mostrarMensagemPrincipal("Erro ao excluir cliente: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao excluir cliente: " + error.message,
+      "erro",
+    );
     return;
   }
 

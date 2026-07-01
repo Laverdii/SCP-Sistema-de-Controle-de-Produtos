@@ -1,4 +1,4 @@
-const SUPABASE_URL = "https://ouuwgxztehzshrtjdehb.supabase.co";
+/* const SUPABASE_URL = "https://ouuwgxztehzshrtjdehb.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_2tOQkWcuI6Xd06OEEG9D1w_Esm6_e9j";
 
 if (typeof usuarioLogadoEhAdmin === "function" && !usuarioLogadoEhAdmin()) {
@@ -308,3 +308,4 @@ pesquisaUsuarioInput.addEventListener("input", function () {
 // ─── Init ─────────────────────────────────────────────────────────
 
 carregarUsuarios();
+*/

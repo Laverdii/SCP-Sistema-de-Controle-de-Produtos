@@ -14,7 +14,9 @@ const btnNovaCategoria = document.getElementById("btnNovaCategoria");
 // ─── Modal ────────────────────────────────────────────────────────
 const modalCategoria = document.getElementById("modalCategoria");
 const modalCategoriaTitulo = document.getElementById("modalCategoriaTitulo");
-const btnFecharModalCategoria = document.getElementById("btnFecharModalCategoria");
+const btnFecharModalCategoria = document.getElementById(
+  "btnFecharModalCategoria",
+);
 const btnCancelarModal = document.getElementById("btnCancelarModal");
 const formCategoria = document.getElementById("formCategoria");
 const mensagem = document.getElementById("mensagem");
@@ -35,20 +37,6 @@ function mostrarMensagem(texto, tipo) {
 function mostrarMensagemPrincipal(texto, tipo) {
   mensagemPrincipal.textContent = texto;
   mensagemPrincipal.className = "mensagem " + tipo;
-}
-
-async function buscarProximoCategoriaIdDisponivel() {
-  const { data, error } = await supabaseClient
-    .from("categoria_produto")
-    .select("categoriaprodutoid")
-    .order("categoriaprodutoid", { ascending: true });
-  if (error) throw error;
-  let proximoId = 1;
-  for (const categoria of data) {
-    if (categoria.categoriaprodutoid === proximoId) proximoId++;
-    if (categoria.categoriaprodutoid > proximoId) break;
-  }
-  return proximoId;
 }
 
 async function descCadastrada(desc, ignorarId) {
@@ -140,7 +128,10 @@ async function carregarCategorias() {
 
   if (error) {
     tabelaCategorias.innerHTML = `<tr><td colspan="3">Erro ao carregar as categorias.</td></tr>`;
-    mostrarMensagemPrincipal("Erro ao buscar as categorias: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao buscar as categorias: " + error.message,
+      "erro",
+    );
     return;
   }
 
@@ -208,17 +199,13 @@ async function salvarCategoria() {
     return;
   }
 
-  let proximoCategoriaId;
-  try {
-    proximoCategoriaId = await buscarProximoCategoriaIdDisponivel();
-  } catch (error) {
-    mostrarMensagem("Erro ao calcular o próximo código: " + error.message, "erro");
-    return;
-  }
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
 
   const { error } = await supabaseClient.from("categoria_produto").insert({
-    categoriaprodutoid: proximoCategoriaId,
     ds_categoria_produto: descCategoria,
+    auth_user_id: user.id,
   });
 
   if (error) {
@@ -255,7 +242,11 @@ async function atualizarNomeCategoria() {
 }
 
 async function excluirCategoria(categoria) {
-  const confirmou = confirm("Tem certeza que deseja excluir a categoria " + categoria.ds_categoria_produto + "?");
+  const confirmou = confirm(
+    "Tem certeza que deseja excluir a categoria " +
+      categoria.ds_categoria_produto +
+      "?",
+  );
   if (!confirmou) return;
 
   const { error } = await supabaseClient
@@ -264,7 +255,10 @@ async function excluirCategoria(categoria) {
     .eq("categoriaprodutoid", categoria.categoriaprodutoid);
 
   if (error) {
-    mostrarMensagemPrincipal("Erro ao excluir categoria: " + error.message, "erro");
+    mostrarMensagemPrincipal(
+      "Erro ao excluir categoria: " + error.message,
+      "erro",
+    );
     return;
   }
 

@@ -447,30 +447,6 @@ async function buscarItemOrcamento(produtoId) {
   return data;
 }
 
-async function gerarProximoOrcamentoItemId() {
-  const { data, error } = await supabaseClient
-    .from("orcamento_item")
-    .select("orcamentoitemid")
-    .order("orcamentoitemid", { ascending: true });
-
-  if (error) {
-    mostrarMensagem("Erro ao gerar ID do item: " + error.message, "erro");
-    return null;
-  }
-
-  let proximoId = 1;
-  for (const item of data) {
-    if (item.orcamentoitemid === proximoId) {
-      proximoId++;
-    }
-    if (item.orcamentoitemid > proximoId) {
-      break;
-    }
-  }
-
-  return proximoId;
-}
-
 async function salvarItemOrcamento(evento) {
   evento.preventDefault();
 
@@ -521,13 +497,7 @@ async function salvarItemOrcamento(evento) {
       .eq("orcamentoid", item.orcamentoid)
       .eq("produtoid", item.produtoid);
   } else {
-    const proximoId = await gerarProximoOrcamentoItemId();
-    if (!proximoId) return;
-
-    resultado = await supabaseClient.from("orcamento_item").insert({
-      orcamentoitemid: proximoId,
-      ...item,
-    });
+    resultado = await supabaseClient.from("orcamento_item").insert(item);
   }
 
   if (resultado.error) {
@@ -725,29 +695,6 @@ async function carregarProdutosDoSelect() {
   });
 }
 
-async function buscarProximoOrcamentoIdDisponivel() {
-  const { data, error } = await supabaseClient
-    .from("orcamento")
-    .select("orcamentoid")
-    .order("orcamentoid", { ascending: true });
-
-  if (error) {
-    throw error;
-  }
-
-  let proximoId = 1;
-  for (const orcamento of data) {
-    if (orcamento.orcamentoid === proximoId) {
-      proximoId++;
-    }
-    if (orcamento.orcamentoid > proximoId) {
-      break;
-    }
-  }
-
-  return proximoId;
-}
-
 // ─── Salvar orçamento (criar ou atualizar) ────────────────────────
 
 async function salvarOrcamento(evento) {
@@ -785,24 +732,23 @@ async function salvarOrcamento(evento) {
 
     mostrarMensagem("Orçamento atualizado com sucesso!", "sucesso");
   } else {
-    let proximoId;
-    try {
-      proximoId = await buscarProximoOrcamentoIdDisponivel();
-    } catch (error) {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
       btnSalvar.disabled = false;
-      mostrarMensagem(
-        "Erro ao calcular o próximo código: " + error.message,
-        "erro",
-      );
+      mostrarMensagem("Sessao expirada. Faca login novamente.", "erro");
       return;
     }
 
     const { error } = await supabaseClient.from("orcamento").insert({
-      orcamentoid: proximoId,
       clienteid: clienteId,
       dt_orcamento: dataOrcamentoInput.value,
       dt_validade_orcamento: validadeOrcamentoInput.value,
       vl_total_orcamento: 0,
+      auth_user_id: user.id,
     });
 
     btnSalvar.disabled = false;

@@ -7,6 +7,7 @@ const inputUsuario = document.getElementById("nomeUsuario");
 const inputSenha = document.getElementById("senhaUsuario");
 const btnCadastrar = document.getElementById("btnCadastrar");
 const mensagem = document.getElementById("mensagem");
+const usuarioRegex = /^[a-zA-Z0-9. ]+$/;
 
 function atualizarBotao() {
   const usuarioPreenchido = inputUsuario.value.trim() !== "";
@@ -19,68 +20,56 @@ function mostrarMensagem(texto, tipo) {
   mensagem.className = "mensagem " + tipo;
 }
 
-async function buscarProximoUsuarioId() {
-  const { data, error } = await supabaseClient
-    .from("usuarios")
-    .select("id")
-    .order("id", { ascending: true });
-
-  if (error) throw error;
-
-  let proximoId = 1;
-  for (const usuario of data) {
-    if (usuario.id === proximoId) proximoId++;
-    if (usuario.id > proximoId) break;
-  }
-
-  return proximoId;
-}
-
-async function usuarioJaExiste(nomeUsuario) {
-  const { data, error } = await supabaseClient
-    .from("usuarios")
-    .select("id")
-    .ilike("usuario", nomeUsuario)
-    .maybeSingle();
-
-  if (error) throw error;
-
-  return Boolean(data);
-}
-
 btnCadastrar.addEventListener("click", async function () {
   const nomeUsuario = inputUsuario.value.trim();
   const senhaUsuario = inputSenha.value.trim();
+  const emailFake = `${nomeUsuario}@example.com`;
+
+  if (!usuarioRegex.test(nomeUsuario)) {
+    mostrarMensagem("Nome de usuário inválido. Use apenas letras, números e espaços.", "erro");
+    return;
+  }
 
   btnCadastrar.disabled = true;
   btnCadastrar.textContent = "Cadastrando...";
   mostrarMensagem("", "");
 
   try {
-    if (await usuarioJaExiste(nomeUsuario)) {
-      mostrarMensagem("Este nome de usuário já está cadastrado.", "erro");
+    const { data, error: erroAuth } = await supabaseClient.auth.signUp({
+      email: emailFake,
+      password: senhaUsuario,
+    });
+
+    if (erroAuth) throw erroAuth;
+    if (!data.user) throw new Error("Usuario nao foi criado no Auth.");
+
+    const { error: erroInsert } = await supabaseClient.from("usuarios").insert({
+      usuario: nomeUsuario,
+      auth_user_id: data.user.id,
+    });
+
+    if (erroInsert) {
+      if (erroInsert.code === "23505") {
+        mostrarMensagem("Este nome de usuario ja esta cadastrado.", "erro");
+      } else {
+        throw erroInsert;
+      }
+
       btnCadastrar.textContent = "Cadastrar";
       atualizarBotao();
       return;
     }
 
-    const proximoId = await buscarProximoUsuarioId();
-
-    const { error } = await supabaseClient.from("usuarios").insert({
-      id: proximoId,
-      usuario: nomeUsuario,
-      senha: senhaUsuario,
-    });
-
-    if (error) throw error;
-
-    mostrarMensagem("Cadastro realizado! Redirecionando para o login...", "sucesso");
+    mostrarMensagem(
+      "Cadastro realizado! Redirecionando para o login...",
+      "sucesso",
+    );
 
     setTimeout(function () {
       window.location.href = "telalogin.html";
     }, 1200);
   } catch (error) {
-    mostrarMensagem("Erro ao cadastrar. Tente novamente.", "erro");
+    mostrarMensagem("Erro ao cadastrar: " + error.message, "erro");
     btnCadastrar.textContent = "Cadastrar";
     atualizarBotao();
   }
